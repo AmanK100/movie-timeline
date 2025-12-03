@@ -1,15 +1,55 @@
 import React, { useMemo, useRef, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { getProcessedData } from './oscarData';
+
+// ==========================================
+// COMPONENT: PARALLAX POSTER (Sliding Window Effect)
+// ==========================================
+const ParallaxPoster = ({ containerRef }) => {
+  const targetRef = useRef(null);
+
+  const { scrollXProgress } = useScroll({
+    target: targetRef,
+    container: containerRef,
+    axis: "x",
+    offset: ["start end", "end start"]
+  });
+
+  // PARALLAX LOGIC:
+  // 1. We scale up the image to 125% permanently so it has room to move around.
+  // 2. We shift the image on the X-axis from -15% to 15% as it crosses the screen.
+  // This creates a "depth" effect where the image appears to move slower than the frame.
+  const x = useTransform(scrollXProgress, [0, 1], ["-15%", "15%"]);
+  const opacity = useTransform(scrollXProgress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
+
+  return (
+    <div ref={targetRef} className="w-full h-full overflow-hidden relative bg-black">
+      {/* Container is masking the content */}
+      <motion.div 
+        style={{ x, opacity, scale: 1.25 }} 
+        className="w-full h-full bg-neutral-800 flex items-center justify-center relative origin-center"
+      >
+        {/* Background Gradient & Grid for depth perception */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-700 to-neutral-900" />
+        
+        {/* Visual Reference Grid (Helps see the movement) */}
+        <div className="absolute inset-0 opacity-20" 
+             style={{ backgroundImage: 'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
+        />
+        
+        {/* The Poster Stub */}
+        <span className="text-neutral-300 font-mono text-4xl font-black tracking-widest z-10 border-4 border-neutral-300 p-8 bg-black/40 backdrop-blur-md shadow-2xl">
+          POSTER IMG
+        </span>
+
+      </motion.div>
+    </div>
+  );
+};
 
 // ==========================================
 // STUBS
 // ==========================================
-
-const FullSizePosterStub = () => (
-  <div className="h-5/6 aspect-[2/3] bg-neutral-800 rounded-lg shadow-2xl flex items-center justify-center border border-neutral-700">
-    <span className="text-neutral-500 font-mono text-xl">POSTER IMG</span>
-  </div>
-);
 
 const MovieStillStub = () => (
   <div className="w-full h-4/6 bg-neutral-800 rounded-lg flex items-center justify-center border border-neutral-700">
@@ -36,7 +76,7 @@ const TextStub = () => (
 );
 
 // ==========================================
-// COVERS (Year & Category)
+// COVERS
 // ==========================================
 
 const YearCover = ({ year }) => (
@@ -49,7 +89,6 @@ const YearCover = ({ year }) => (
 
 const CategoryCover = ({ title, subtitle }) => (
   <section className="min-w-[100vw] h-full flex flex-col items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0 p-8">
-    {/* UPDATED: Reduced font size to text-4xl (mobile) / text-7xl (desktop) */}
     <h2 className="text-4xl md:text-7xl font-black text-center uppercase tracking-tighter mb-6 stroke-text-white max-w-[90vw]">
       {title}
     </h2>
@@ -72,43 +111,6 @@ const FullScreenTitle = ({ title, subtitle, bg = "bg-black" }) => (
   </section>
 );
 
-// ==========================================
-// MOVIE SLIDE (Content Only)
-// ==========================================
-const MovieSlide = () => {
-  // Common styles for each section
-  const sectionStyles = "h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0";
-
-  return (
-    <>
-      {/* --- Col 1: POSTER --- */}
-      <section className={`${sectionStyles} min-w-[50vw] p-8`}>
-        <FullSizePosterStub />
-      </section>
-
-      {/* --- Col 2: TEXT BLOCK 1 --- */}
-      <section className={`${sectionStyles} min-w-[35vw]`}>
-        <TextStub />
-      </section>
-
-      {/* --- Col 3: MOVIE STILL --- */}
-      <section className={`${sectionStyles} min-w-[60vw] p-8`}>
-        <MovieStillStub />
-      </section>
-
-      {/* --- Col 4: TEXT BLOCK 2 --- */}
-      <section className={`${sectionStyles} min-w-[35vw]`}>
-        <TextStub />
-      </section>
-
-      {/* --- Col 5: VIDEO --- */}
-      <section className={`${sectionStyles} min-w-[50vw] p-8`}>
-        <FullSizeVideoStub />
-      </section>
-    </>
-  );
-};
-
 const IntroText = () => (
   <section className="min-w-[60vw] h-full flex items-center justify-center snap-start bg-neutral-900 border-r border-neutral-800 p-12 shrink-0">
     <div className="max-w-2xl text-xl text-neutral-300 leading-relaxed font-light">
@@ -119,7 +121,43 @@ const IntroText = () => (
 );
 
 // ==========================================
-// HELPER: Calculate Ordinal (1st, 2nd, 3rd)
+// MOVIE SLIDE
+// ==========================================
+const MovieSlide = ({ scrollRef }) => {
+  const sectionStyles = "h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0";
+
+  return (
+    <>
+      {/* Col 1: POSTER - Full Bleed with Sliding Parallax */}
+      <section className={`${sectionStyles} min-w-[50vw] p-0 overflow-hidden`}>
+        <ParallaxPoster containerRef={scrollRef} />
+      </section>
+
+      {/* Col 2: TEXT BLOCK 1 */}
+      <section className={`${sectionStyles} min-w-[35vw]`}>
+        <TextStub />
+      </section>
+
+      {/* Col 3: MOVIE STILL */}
+      <section className={`${sectionStyles} min-w-[60vw] p-8`}>
+        <MovieStillStub />
+      </section>
+
+      {/* Col 4: TEXT BLOCK 2 */}
+      <section className={`${sectionStyles} min-w-[35vw]`}>
+        <TextStub />
+      </section>
+
+      {/* Col 5: VIDEO */}
+      <section className={`${sectionStyles} min-w-[50vw] p-8`}>
+        <FullSizeVideoStub />
+      </section>
+    </>
+  );
+};
+
+// ==========================================
+// HELPERS
 // ==========================================
 const getOrdinalCeremony = (year) => {
   const n = year - 1927;
@@ -178,36 +216,23 @@ function App() {
             return (
               <React.Fragment key={yearData.filmYear}>
                 
-                {/* 1. YEAR COVER */}
                 <YearCover year={yearData.filmYear} />
 
-                {/* 2. ACADEMY BEST PICTURE */}
-                <CategoryCover 
-                  title="Best Picture" 
-                  subtitle={ceremonySubtitle} 
-                />
-                <MovieSlide />
+                {/* BEST PICTURE */}
+                <CategoryCover title="Best Picture" subtitle={ceremonySubtitle} />
+                <MovieSlide scrollRef={scrollContainerRef} />
 
-                {/* 3. AUDIENCE FAVORITE (ENGLISH) */}
-                <CategoryCover 
-                  title="Audience Favorite" 
-                  subtitle="English Language" 
-                />
-                <MovieSlide />
+                {/* AUDIENCE FAV (ENGLISH) */}
+                <CategoryCover title="Audience Favorite" subtitle="English Language" />
+                <MovieSlide scrollRef={scrollContainerRef} />
 
-                {/* 4. ACADEMY INTERNATIONAL */}
-                <CategoryCover 
-                  title="Best International Feature Film" 
-                  subtitle={ceremonySubtitle} 
-                />
-                <MovieSlide />
+                {/* INTERNATIONAL */}
+                <CategoryCover title="Best International Feature Film" subtitle={ceremonySubtitle} />
+                <MovieSlide scrollRef={scrollContainerRef} />
 
-                {/* 5. AUDIENCE FAVORITE (INTERNATIONAL) */}
-                <CategoryCover 
-                  title="Audience Favorite" 
-                  subtitle="International" 
-                />
-                <MovieSlide />
+                {/* AUDIENCE FAV (INTL) */}
+                <CategoryCover title="Audience Favorite" subtitle="International" />
+                <MovieSlide scrollRef={scrollContainerRef} />
               
               </React.Fragment>
             );
