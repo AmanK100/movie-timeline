@@ -36,8 +36,9 @@ const TextStub = () => (
 );
 
 // ==========================================
-// NEW COMPONENT: YEAR COVER
+// COVERS (Year & Category)
 // ==========================================
+
 const YearCover = ({ year }) => (
   <section className="min-w-[100vw] h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0">
     <h2 className="text-[12rem] md:text-[20rem] font-bold stroke-text tracking-tighter">
@@ -46,73 +47,17 @@ const YearCover = ({ year }) => (
   </section>
 );
 
-// ==========================================
-// MOVIE SLIDE (Year column removed)
-// ==========================================
-const MovieSlide = ({ title, category, year }) => {
-  // Logic to create the category title (e.g., "23RD ACADEMY..." or "AUDIENCE FAV")
-  let categoryTitleNode;
-  if (category.includes("Academy")) {
-    const ceremonyNumber = year - 1927;
-    const ordinal = (n) => {
-      const s = ["TH", "ST", "ND", "RD"];
-      const v = n % 100;
-      return n + (s[(v - 20) % 10] || s[v] || s[0]);
-    };
-    categoryTitleNode = (
-      <>
-        <span className="text-red-600 stroke-text-white" style={{WebkitTextStroke: '0px'}}>{ordinal(ceremonyNumber)}</span> ACADEMY<br/>BEST PICTURE
-      </>
-    );
-  } else {
-    categoryTitleNode = "AUDIENCE FAV";
-  }
+const CategoryCover = ({ title, subtitle }) => (
+  <section className="min-w-[100vw] h-full flex flex-col items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0 p-8">
+    <h2 className="text-6xl md:text-9xl font-black text-center uppercase tracking-tighter mb-6 stroke-text-white">
+      {title}
+    </h2>
+    <p className="text-xl md:text-3xl text-red-600 font-mono tracking-widest uppercase border-t border-red-600 pt-4">
+      {subtitle}
+    </p>
+  </section>
+);
 
-  // Common styles for each section
-  const sectionStyles = "h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0";
-
-  return (
-    <>
-      {/* NOTE: Year Column removed from here. It is now handled by YearCover component. */}
-
-      {/* --- Col 1: CATEGORY TITLE --- */}
-      <section className={`${sectionStyles} min-w-[35vw] p-8`}>
-        <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none text-center stroke-text-white">
-          {categoryTitleNode}
-        </h2>
-      </section>
-
-      {/* --- Col 2: POSTER --- */}
-      <section className={`${sectionStyles} min-w-[50vw] p-8`}>
-        <FullSizePosterStub />
-      </section>
-
-      {/* --- Col 3: TEXT BLOCK 1 --- */}
-      <section className={`${sectionStyles} min-w-[35vw]`}>
-        <TextStub />
-      </section>
-
-      {/* --- Col 4: MOVIE STILL --- */}
-      <section className={`${sectionStyles} min-w-[60vw] p-8`}>
-        <MovieStillStub />
-      </section>
-
-      {/* --- Col 5: TEXT BLOCK 2 --- */}
-      <section className={`${sectionStyles} min-w-[35vw]`}>
-        <TextStub />
-      </section>
-
-      {/* --- Col 6: VIDEO --- */}
-      <section className={`${sectionStyles} min-w-[50vw] p-8`}>
-        <FullSizeVideoStub />
-      </section>
-    </>
-  );
-};
-
-// ==========================================
-// COVERS
-// ==========================================
 const FullScreenTitle = ({ title, subtitle, bg = "bg-black" }) => (
   <section className={`min-w-[100vw] h-full flex flex-col items-center justify-center snap-start ${bg} text-center p-4 border-r border-neutral-800 shrink-0`}>
     <h1 className="text-6xl md:text-9xl font-black text-white tracking-tighter uppercase mb-4">
@@ -126,6 +71,43 @@ const FullScreenTitle = ({ title, subtitle, bg = "bg-black" }) => (
   </section>
 );
 
+// ==========================================
+// MOVIE SLIDE (Title removed, only content)
+// ==========================================
+const MovieSlide = () => {
+  // Common styles for each section
+  const sectionStyles = "h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0";
+
+  return (
+    <>
+      {/* --- Col 1: POSTER --- */}
+      <section className={`${sectionStyles} min-w-[50vw] p-8`}>
+        <FullSizePosterStub />
+      </section>
+
+      {/* --- Col 2: TEXT BLOCK 1 --- */}
+      <section className={`${sectionStyles} min-w-[35vw]`}>
+        <TextStub />
+      </section>
+
+      {/* --- Col 3: MOVIE STILL --- */}
+      <section className={`${sectionStyles} min-w-[60vw] p-8`}>
+        <MovieStillStub />
+      </section>
+
+      {/* --- Col 4: TEXT BLOCK 2 --- */}
+      <section className={`${sectionStyles} min-w-[35vw]`}>
+        <TextStub />
+      </section>
+
+      {/* --- Col 5: VIDEO --- */}
+      <section className={`${sectionStyles} min-w-[50vw] p-8`}>
+        <FullSizeVideoStub />
+      </section>
+    </>
+  );
+};
+
 const IntroText = () => (
   <section className="min-w-[60vw] h-full flex items-center justify-center snap-start bg-neutral-900 border-r border-neutral-800 p-12 shrink-0">
     <div className="max-w-2xl text-xl text-neutral-300 leading-relaxed font-light">
@@ -134,6 +116,19 @@ const IntroText = () => (
     </div>
   </section>
 );
+
+// ==========================================
+// HELPER: Calculate Ordinal (1st, 2nd, 3rd)
+// ==========================================
+const getOrdinalCeremony = (year) => {
+  // 1927 was the 1st, so 1929 was 1st ceremony... 
+  // Actually 1st ceremony was May 1929 honoring 1927/1928.
+  // We roughly calculated year - 1927 in previous steps for the ceremony number.
+  const n = year - 1927;
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
 
 // ==========================================
 // MAIN APP
@@ -154,7 +149,7 @@ function App() {
 
   const decades = Object.keys(dataByDecade).sort();
 
-  // Scroll Hijack (Vertical -> Horizontal)
+  // Scroll Hijack
   useEffect(() => {
     const container = scrollContainerRef.current;
     const handleWheel = (e) => {
@@ -179,20 +174,46 @@ function App() {
         <React.Fragment key={decade}>
           <FullScreenTitle title={`${decade}s`} subtitle="The Era Begins" bg="bg-neutral-900" />
           
-          {dataByDecade[decade].map((yearData) => (
-            <React.Fragment key={yearData.filmYear}>
-              
-              {/* --- 1. SINGLE YEAR COVER (Appears once per year group) --- */}
-              <YearCover year={yearData.filmYear} />
+          {dataByDecade[decade].map((yearData) => {
+            const ceremonySubtitle = `${getOrdinalCeremony(yearData.filmYear)} Academy Awards`;
 
-              {/* --- 2. THE 4 MOVIES (Category, Poster, etc.) --- */}
-              <MovieSlide year={yearData.filmYear} category="Academy Best Picture" title={yearData.bestPicture} />
-              <MovieSlide year={yearData.filmYear} category="Audience Favorite (English)" title={yearData.highestRatedEnglish} />
-              <MovieSlide year={yearData.filmYear} category="Academy Best International" title={yearData.bestInternational} />
-              <MovieSlide year={yearData.filmYear} category="Audience Favorite (Intl)" title={yearData.highestRatedInternational} />
-            
-            </React.Fragment>
-          ))}
+            return (
+              <React.Fragment key={yearData.filmYear}>
+                
+                {/* 1. YEAR COVER */}
+                <YearCover year={yearData.filmYear} />
+
+                {/* 2. ACADEMY BEST PICTURE */}
+                <CategoryCover 
+                  title="Best Picture" 
+                  subtitle={ceremonySubtitle} 
+                />
+                <MovieSlide />
+
+                {/* 3. AUDIENCE FAVORITE (ENGLISH) */}
+                <CategoryCover 
+                  title="Audience Favorite" 
+                  subtitle="English Language" 
+                />
+                <MovieSlide />
+
+                {/* 4. ACADEMY INTERNATIONAL */}
+                <CategoryCover 
+                  title="Best International" 
+                  subtitle={ceremonySubtitle} 
+                />
+                <MovieSlide />
+
+                {/* 5. AUDIENCE FAVORITE (INTERNATIONAL) */}
+                <CategoryCover 
+                  title="Audience Favorite" 
+                  subtitle="International" 
+                />
+                <MovieSlide />
+              
+              </React.Fragment>
+            );
+          })}
         </React.Fragment>
       ))}
       <section className="min-w-[20vw] h-full bg-black snap-start shrink-0"></section>
