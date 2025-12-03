@@ -163,7 +163,7 @@ function App() {
   return (
     <div 
       ref={scrollContainerRef}
-      className="flex flex-row h-screen w-screen overflow-x-auto overflow-y-hidden bg-neutral-950 text-neutral-200 snap-x snap-mandatory no-scrollbar items-stretch"
+      className="flex flex-row h-screen w-screen overflow-x-auto overflow-y-hidden bg-neutral-950 text-neutral-200 snap-x snap-mandatory items-stretch pb-4"
     >
       <FullScreenTitle title="Evolution" subtitle="The Academy vs The Audience" />
       <IntroText />

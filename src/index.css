@@ -1,23 +1,33 @@
 @import "tailwindcss";
 
 /* 1. LOCK THE BODY */
-/* This prevents the "rubber band" effect and forces the browser to listen to our JS */
 html, body, #root {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* CRITICAL: Disables native vertical scrolling */
-  background-color: #0a0a0a; /* Match your bg-neutral-950 */
+  overflow: hidden; 
+  background-color: #0a0a0a;
 }
 
-/* 2. HIDE SCROLLBARS BUT ALLOW SCROLLING */
-.no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+/* 2. CUSTOM SCROLLBAR (Visible but Sleek) */
+/* This targets the horizontal scrollbar at the bottom */
+::-webkit-scrollbar {
+  height: 16px; /* Height of the clickable area */
 }
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+
+::-webkit-scrollbar-track {
+  background: #000; /* Background of the bar */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #333; /* The moving handle color */
+  border-radius: 10px;    /* Rounded corners */
+  border: 4px solid #000; /* Creates a "padding" effect around the handle */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Lighter grey when you hover over it */
 }
 
 /* 3. YOUR TEXT STYLES */
@@ -26,7 +36,6 @@ html, body, #root {
   color: transparent;
 }
 
-/* --- NEW: White outline for category titles --- */
 .stroke-text-white {
   -webkit-text-stroke: 2px #fff;
   color: transparent;
