@@ -3,11 +3,10 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { getProcessedData } from './oscarData';
 
 // ==========================================
-// COMPONENT: PARALLAX POSTER (Sliding Window Effect)
+// COMPONENT: PARALLAX IMAGE (Generic)
 // ==========================================
-const ParallaxPoster = ({ containerRef }) => {
+const ParallaxImage = ({ containerRef, label = "IMG", scaleBase = 1.25 }) => {
   const targetRef = useRef(null);
-
   const { scrollXProgress } = useScroll({
     target: targetRef,
     container: containerRef,
@@ -15,33 +14,25 @@ const ParallaxPoster = ({ containerRef }) => {
     offset: ["start end", "end start"]
   });
 
-  // PARALLAX LOGIC:
-  // 1. We scale up the image to 125% permanently so it has room to move around.
-  // 2. We shift the image on the X-axis from -15% to 15% as it crosses the screen.
-  // This creates a "depth" effect where the image appears to move slower than the frame.
   const x = useTransform(scrollXProgress, [0, 1], ["-15%", "15%"]);
-  const opacity = useTransform(scrollXProgress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
+  const opacity = useTransform(scrollXProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
 
   return (
     <div ref={targetRef} className="w-full h-full overflow-hidden relative bg-black">
-      {/* Container is masking the content */}
       <motion.div 
-        style={{ x, opacity, scale: 1.25 }} 
+        style={{ x, opacity, scale: scaleBase }} 
         className="w-full h-full bg-neutral-800 flex items-center justify-center relative origin-center"
       >
-        {/* Background Gradient & Grid for depth perception */}
+        {/* Background Gradients */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-700 to-neutral-900" />
-        
-        {/* Visual Reference Grid (Helps see the movement) */}
         <div className="absolute inset-0 opacity-20" 
              style={{ backgroundImage: 'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
         />
         
-        {/* The Poster Stub */}
-        <span className="text-neutral-300 font-mono text-4xl font-black tracking-widest z-10 border-4 border-neutral-300 p-8 bg-black/40 backdrop-blur-md shadow-2xl">
-          POSTER IMG
+        {/* Label Stub */}
+        <span className="text-neutral-300 font-mono text-4xl font-black tracking-widest z-10 border-4 border-neutral-300 p-6 bg-black/40 backdrop-blur-md shadow-2xl uppercase">
+          {label}
         </span>
-
       </motion.div>
     </div>
   );
@@ -51,27 +42,28 @@ const ParallaxPoster = ({ containerRef }) => {
 // STUBS
 // ==========================================
 
-const MovieStillStub = () => (
-  <div className="w-full h-4/6 bg-neutral-800 rounded-lg flex items-center justify-center border border-neutral-700">
-    <span className="text-neutral-500 font-mono text-xl">MOVIE STILL IMG</span>
+const StaticPosterStub = () => (
+  <div className="h-4/6 aspect-[2/3] bg-neutral-800 rounded-lg shadow-2xl flex items-center justify-center border border-neutral-700 shrink-0">
+    <span className="text-neutral-500 font-mono text-xl font-bold">PORTRAIT POSTER</span>
   </div>
 );
 
 const FullSizeVideoStub = () => (
-  <div className="w-full max-w-4xl aspect-video bg-neutral-900 rounded-lg border border-neutral-700 flex items-center justify-center">
-    <div className="w-20 h-20 rounded-full border-4 border-neutral-600 flex items-center justify-center">
-      <div className="w-0 h-0 border-t-[16px] border-t-transparent border-l-[24px] border-l-white border-b-[16px] border-b-transparent ml-2"></div>
+  <div className="w-full h-full max-w-5xl max-h-[80vh] aspect-video bg-neutral-900 rounded-lg border border-neutral-700 flex items-center justify-center shadow-2xl">
+    <div className="w-24 h-24 rounded-full border-4 border-neutral-500 flex items-center justify-center group cursor-pointer hover:border-white hover:scale-110 transition-all duration-300">
+      <div className="w-0 h-0 border-t-[20px] border-t-transparent border-l-[32px] border-l-neutral-500 border-b-[20px] border-b-transparent ml-2 group-hover:border-l-white transition-colors"></div>
     </div>
   </div>
 );
 
 const TextStub = () => (
-  <div className="max-w-md space-y-4 p-8">
-    <p className="text-neutral-500 font-mono mb-4 text-center">PLACEHOLDER TEXT</p>
-    <div className="h-4 bg-neutral-800 rounded w-full animate-pulse"></div>
-    <div className="h-4 bg-neutral-800 rounded w-5/6 mx-auto animate-pulse"></div>
-    <div className="h-4 bg-neutral-800 rounded w-full animate-pulse"></div>
-    <div className="h-4 bg-neutral-800 rounded w-4/6 mx-auto animate-pulse"></div>
+  <div className="w-full max-w-lg space-y-6 p-8">
+    <div className="h-6 bg-neutral-800 rounded w-1/3 mb-8"></div>
+    <div className="h-4 bg-neutral-800 rounded w-full"></div>
+    <div className="h-4 bg-neutral-800 rounded w-full"></div>
+    <div className="h-4 bg-neutral-800 rounded w-5/6"></div>
+    <div className="h-4 bg-neutral-800 rounded w-full"></div>
+    <div className="h-4 bg-neutral-800 rounded w-4/6"></div>
   </div>
 );
 
@@ -121,35 +113,46 @@ const IntroText = () => (
 );
 
 // ==========================================
-// MOVIE SLIDE
+// MOVIE SLIDE (UPDATED FLOW)
 // ==========================================
 const MovieSlide = ({ scrollRef }) => {
-  const sectionStyles = "h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0";
-
   return (
     <>
-      {/* Col 1: POSTER - Full Bleed with Sliding Parallax */}
-      <section className={`${sectionStyles} min-w-[50vw] p-0 overflow-hidden`}>
-        <ParallaxPoster containerRef={scrollRef} />
+      {/* SLIDE 1: INTRO (Split Screen) 
+        Left: Static Portrait Poster | Right: Text Info
+      */}
+      <section className="min-w-[100vw] h-full flex snap-start border-r border-neutral-800 bg-black shrink-0">
+        <div className="w-[40%] h-full flex items-center justify-center border-r border-neutral-900 bg-neutral-950">
+          <StaticPosterStub />
+        </div>
+        <div className="w-[60%] h-full flex items-center justify-center bg-black">
+          <TextStub />
+        </div>
       </section>
 
-      {/* Col 2: TEXT BLOCK 1 */}
-      <section className={`${sectionStyles} min-w-[35vw]`}>
-        <TextStub />
+      {/* SLIDE 2: THE IMMERSION (Full Screen Parallax)
+        THIS IS NOW THE WIDE STILL (Not the Poster)
+      */}
+      <section className="min-w-[100vw] h-full snap-start border-r border-neutral-800 bg-black shrink-0 overflow-hidden">
+        <ParallaxImage containerRef={scrollRef} label="WIDE STILL (FULL)" />
       </section>
 
-      {/* Col 3: MOVIE STILL */}
-      <section className={`${sectionStyles} min-w-[60vw] p-8`}>
-        <MovieStillStub />
+      {/* SLIDE 3: THE CONTEXT (Wide Split)
+        Left: SAME WIDE STILL (65%) | Right: Text (35%)
+      */}
+      <section className="min-w-[100vw] h-full flex snap-start border-r border-neutral-800 bg-black shrink-0">
+        <div className="w-[65%] h-full border-r border-neutral-900 overflow-hidden">
+          {/* Re-using the same still here to create the continuity effect */}
+          <ParallaxImage containerRef={scrollRef} label="WIDE STILL (CONT.)" scaleBase={1.2} />
+        </div>
+        <div className="w-[35%] h-full flex items-center justify-center bg-black">
+          <TextStub />
+        </div>
       </section>
 
-      {/* Col 4: TEXT BLOCK 2 */}
-      <section className={`${sectionStyles} min-w-[35vw]`}>
-        <TextStub />
-      </section>
-
-      {/* Col 5: VIDEO */}
-      <section className={`${sectionStyles} min-w-[50vw] p-8`}>
+      {/* SLIDE 4: THE VIDEO (Full Screen)
+      */}
+      <section className="min-w-[100vw] h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0 p-8">
         <FullSizeVideoStub />
       </section>
     </>
@@ -185,7 +188,6 @@ function App() {
 
   const decades = Object.keys(dataByDecade).sort();
 
-  // Scroll Hijack
   useEffect(() => {
     const container = scrollContainerRef.current;
     const handleWheel = (e) => {
