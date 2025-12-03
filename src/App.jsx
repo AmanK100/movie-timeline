@@ -49,7 +49,8 @@ const YearCover = ({ year }) => (
 
 const CategoryCover = ({ title, subtitle }) => (
   <section className="min-w-[100vw] h-full flex flex-col items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0 p-8">
-    <h2 className="text-6xl md:text-9xl font-black text-center uppercase tracking-tighter mb-6 stroke-text-white">
+    {/* UPDATED: Reduced font size to text-4xl (mobile) / text-7xl (desktop) */}
+    <h2 className="text-4xl md:text-7xl font-black text-center uppercase tracking-tighter mb-6 stroke-text-white max-w-[90vw]">
       {title}
     </h2>
     <p className="text-xl md:text-3xl text-red-600 font-mono tracking-widest uppercase border-t border-red-600 pt-4">
@@ -72,7 +73,7 @@ const FullScreenTitle = ({ title, subtitle, bg = "bg-black" }) => (
 );
 
 // ==========================================
-// MOVIE SLIDE (Title removed, only content)
+// MOVIE SLIDE (Content Only)
 // ==========================================
 const MovieSlide = () => {
   // Common styles for each section
@@ -121,9 +122,6 @@ const IntroText = () => (
 // HELPER: Calculate Ordinal (1st, 2nd, 3rd)
 // ==========================================
 const getOrdinalCeremony = (year) => {
-  // 1927 was the 1st, so 1929 was 1st ceremony... 
-  // Actually 1st ceremony was May 1929 honoring 1927/1928.
-  // We roughly calculated year - 1927 in previous steps for the ceremony number.
   const n = year - 1927;
   const s = ["th", "st", "nd", "rd"];
   const v = n % 100;
@@ -199,7 +197,7 @@ function App() {
 
                 {/* 4. ACADEMY INTERNATIONAL */}
                 <CategoryCover 
-                  title="Best International" 
+                  title="Best International Feature Film" 
                   subtitle={ceremonySubtitle} 
                 />
                 <MovieSlide />
