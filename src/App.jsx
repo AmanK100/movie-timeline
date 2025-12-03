@@ -51,25 +51,27 @@ const ParallaxImage = ({ containerRef, imgSrc, label = "IMG", scaleBase = 1.25 }
     </div>
   );
 };
-
 // ==========================================
-// COMPONENT: STATIC POSTER (Handles Real Images or Fallback)
+// COMPONENT: STATIC POSTER (Updated to Full Height Strip)
 // ==========================================
 const StaticPoster = ({ imgSrc }) => {
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className="h-4/6 aspect-[2/3] bg-neutral-800 rounded-lg shadow-2xl flex items-center justify-center border border-neutral-700 shrink-0 overflow-hidden relative">
+    // Changed: h-full, w-full, removed rounded corners for full-bleed look
+    <div className="h-full w-full bg-neutral-800 flex items-center justify-center shrink-0 overflow-hidden relative">
       {!imgError && imgSrc ? (
         <img 
           src={imgSrc} 
           alt="Poster"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover" // object-cover ensures it crops nicely to fill the strip
           onError={() => setImgError(true)}
         />
       ) : (
         // Fallback Stub
-        <span className="text-neutral-500 font-mono text-xl font-bold">PORTRAIT POSTER</span>
+        <span className="text-neutral-500 font-mono text-xl font-bold border-4 border-neutral-600 p-4">
+          PORTRAIT POSTER
+        </span>
       )}
     </div>
   );

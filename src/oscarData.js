@@ -1,13 +1,12 @@
 // src/oscarData.js
 
-// Helper to create the default object structure to save space
-// You can expand any of these objects manually later when you add custom descriptions.
+// Helper to generate consistent paths
 const mkMovie = (year, key, title) => ({
   title: title,
   poster: `/images/${year}/${key}_poster.jpg`,
   still: `/images/${year}/${key}_still.jpg`,
-  description: "", // Fill this in later
-  video: ""        // Fill this in later
+  description: "", 
+  video: ""        
 });
 
 export const oscarMasterList = [
