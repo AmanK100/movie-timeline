@@ -1,12 +1,14 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { getProcessedData } from './oscarData';
 
 // ==========================================
-// COMPONENT: PARALLAX IMAGE (Generic)
+// COMPONENT: PARALLAX IMAGE (Handles Real Images or Fallback)
 // ==========================================
-const ParallaxImage = ({ containerRef, label = "IMG", scaleBase = 1.25 }) => {
+const ParallaxImage = ({ containerRef, imgSrc, label = "IMG", scaleBase = 1.25 }) => {
   const targetRef = useRef(null);
+  const [imgError, setImgError] = useState(false);
+
   const { scrollXProgress } = useScroll({
     target: targetRef,
     container: containerRef,
@@ -23,30 +25,59 @@ const ParallaxImage = ({ containerRef, label = "IMG", scaleBase = 1.25 }) => {
         style={{ x, opacity, scale: scaleBase }} 
         className="w-full h-full bg-neutral-800 flex items-center justify-center relative origin-center"
       >
-        {/* Background Gradients */}
+        {/* Background Gradients (Always visible for depth) */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-700 to-neutral-900" />
-        <div className="absolute inset-0 opacity-20" 
-             style={{ backgroundImage: 'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
-        />
         
-        {/* Label Stub */}
-        <span className="text-neutral-300 font-mono text-4xl font-black tracking-widest z-10 border-4 border-neutral-300 p-6 bg-black/40 backdrop-blur-md shadow-2xl uppercase">
-          {label}
-        </span>
+        {!imgError && imgSrc ? (
+          // 1. TRY TO SHOW REAL IMAGE
+          <img 
+            src={imgSrc} 
+            alt={label} 
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={() => setImgError(true)} // If 404, switch to stub
+          />
+        ) : (
+          // 2. FALLBACK STUB (If image missing or error)
+          <>
+            <div className="absolute inset-0 opacity-20" 
+                style={{ backgroundImage: 'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
+            />
+            <span className="text-neutral-300 font-mono text-4xl font-black tracking-widest z-10 border-4 border-neutral-300 p-6 bg-black/40 backdrop-blur-md shadow-2xl uppercase">
+              {label}
+            </span>
+          </>
+        )}
       </motion.div>
     </div>
   );
 };
 
 // ==========================================
-// STUBS
+// COMPONENT: STATIC POSTER (Handles Real Images or Fallback)
 // ==========================================
+const StaticPoster = ({ imgSrc }) => {
+  const [imgError, setImgError] = useState(false);
 
-const StaticPosterStub = () => (
-  <div className="h-4/6 aspect-[2/3] bg-neutral-800 rounded-lg shadow-2xl flex items-center justify-center border border-neutral-700 shrink-0">
-    <span className="text-neutral-500 font-mono text-xl font-bold">PORTRAIT POSTER</span>
-  </div>
-);
+  return (
+    <div className="h-4/6 aspect-[2/3] bg-neutral-800 rounded-lg shadow-2xl flex items-center justify-center border border-neutral-700 shrink-0 overflow-hidden relative">
+      {!imgError && imgSrc ? (
+        <img 
+          src={imgSrc} 
+          alt="Poster"
+          className="w-full h-full object-cover"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        // Fallback Stub
+        <span className="text-neutral-500 font-mono text-xl font-bold">PORTRAIT POSTER</span>
+      )}
+    </div>
+  );
+};
+
+// ==========================================
+// STUBS (Video & Text)
+// ==========================================
 
 const FullSizeVideoStub = () => (
   <div className="w-full h-full max-w-5xl max-h-[80vh] aspect-video bg-neutral-900 rounded-lg border border-neutral-700 flex items-center justify-center shadow-2xl">
@@ -56,14 +87,22 @@ const FullSizeVideoStub = () => (
   </div>
 );
 
-const TextStub = () => (
+const TextStub = ({ title, description }) => (
   <div className="w-full max-w-lg space-y-6 p-8">
-    <div className="h-6 bg-neutral-800 rounded w-1/3 mb-8"></div>
-    <div className="h-4 bg-neutral-800 rounded w-full"></div>
-    <div className="h-4 bg-neutral-800 rounded w-full"></div>
-    <div className="h-4 bg-neutral-800 rounded w-5/6"></div>
-    <div className="h-4 bg-neutral-800 rounded w-full"></div>
-    <div className="h-4 bg-neutral-800 rounded w-4/6"></div>
+    <h3 className="text-3xl font-bold text-white mb-4">{title}</h3>
+    {description ? (
+      <p className="text-neutral-400 text-lg leading-relaxed font-light">
+        {description}
+      </p>
+    ) : (
+      // Fallback text lines if no description in data
+      <>
+        <div className="h-4 bg-neutral-800 rounded w-full"></div>
+        <div className="h-4 bg-neutral-800 rounded w-full"></div>
+        <div className="h-4 bg-neutral-800 rounded w-5/6"></div>
+        <div className="h-4 bg-neutral-800 rounded w-full"></div>
+      </>
+    )}
   </div>
 );
 
@@ -113,45 +152,52 @@ const IntroText = () => (
 );
 
 // ==========================================
-// MOVIE SLIDE (UPDATED FLOW)
+// MOVIE SLIDE (Receives full movie object)
 // ==========================================
-const MovieSlide = ({ scrollRef }) => {
+const MovieSlide = ({ scrollRef, movieData }) => {
+  // Safety check: if old data format or null, show error or skip
+  if (!movieData) return null;
+
+  // Even if movieData exists, the image paths inside it might lead to missing files.
+  // The StaticPoster and ParallaxImage components handle that internally now.
+
   return (
     <>
-      {/* SLIDE 1: INTRO (Split Screen) 
-        Left: Static Portrait Poster | Right: Text Info
-      */}
+      {/* SLIDE 1: INTRO (Portrait Poster + Info) */}
       <section className="min-w-[100vw] h-full flex snap-start border-r border-neutral-800 bg-black shrink-0">
         <div className="w-[40%] h-full flex items-center justify-center border-r border-neutral-900 bg-neutral-950">
-          <StaticPosterStub />
+          <StaticPoster imgSrc={movieData.poster} />
         </div>
         <div className="w-[60%] h-full flex items-center justify-center bg-black">
-          <TextStub />
+          <TextStub title={movieData.title} description={movieData.description} />
         </div>
       </section>
 
-      {/* SLIDE 2: THE IMMERSION (Full Screen Parallax)
-        THIS IS NOW THE WIDE STILL (Not the Poster)
-      */}
+      {/* SLIDE 2: IMMERSION (Wide Still Full Screen) */}
       <section className="min-w-[100vw] h-full snap-start border-r border-neutral-800 bg-black shrink-0 overflow-hidden">
-        <ParallaxImage containerRef={scrollRef} label="WIDE STILL (FULL)" />
+        <ParallaxImage 
+          containerRef={scrollRef} 
+          imgSrc={movieData.still} 
+          label="WIDE STILL" 
+        />
       </section>
 
-      {/* SLIDE 3: THE CONTEXT (Wide Split)
-        Left: SAME WIDE STILL (65%) | Right: Text (35%)
-      */}
+      {/* SLIDE 3: CONTEXT (Wide Still + Context Text) */}
       <section className="min-w-[100vw] h-full flex snap-start border-r border-neutral-800 bg-black shrink-0">
         <div className="w-[65%] h-full border-r border-neutral-900 overflow-hidden">
-          {/* Re-using the same still here to create the continuity effect */}
-          <ParallaxImage containerRef={scrollRef} label="WIDE STILL (CONT.)" scaleBase={1.2} />
+          <ParallaxImage 
+            containerRef={scrollRef} 
+            imgSrc={movieData.still} 
+            label="WIDE STILL" 
+            scaleBase={1.2} 
+          />
         </div>
         <div className="w-[35%] h-full flex items-center justify-center bg-black">
-          <TextStub />
+          <TextStub title="The Scene" description={movieData.description} />
         </div>
       </section>
 
-      {/* SLIDE 4: THE VIDEO (Full Screen)
-      */}
+      {/* SLIDE 4: VIDEO */}
       <section className="min-w-[100vw] h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0 p-8">
         <FullSizeVideoStub />
       </section>
@@ -222,19 +268,31 @@ function App() {
 
                 {/* BEST PICTURE */}
                 <CategoryCover title="Best Picture" subtitle={ceremonySubtitle} />
-                <MovieSlide scrollRef={scrollContainerRef} />
+                <MovieSlide 
+                  scrollRef={scrollContainerRef} 
+                  movieData={yearData.bestPicture} 
+                />
 
                 {/* AUDIENCE FAV (ENGLISH) */}
                 <CategoryCover title="Audience Favorite" subtitle="English Language" />
-                <MovieSlide scrollRef={scrollContainerRef} />
+                <MovieSlide 
+                  scrollRef={scrollContainerRef} 
+                  movieData={yearData.highestRatedEnglish} 
+                />
 
                 {/* INTERNATIONAL */}
                 <CategoryCover title="Best International Feature Film" subtitle={ceremonySubtitle} />
-                <MovieSlide scrollRef={scrollContainerRef} />
+                <MovieSlide 
+                  scrollRef={scrollContainerRef} 
+                  movieData={yearData.bestInternational} 
+                />
 
                 {/* AUDIENCE FAV (INTL) */}
                 <CategoryCover title="Audience Favorite" subtitle="International" />
-                <MovieSlide scrollRef={scrollContainerRef} />
+                <MovieSlide 
+                  scrollRef={scrollContainerRef} 
+                  movieData={yearData.highestRatedInternational} 
+                />
               
               </React.Fragment>
             );
