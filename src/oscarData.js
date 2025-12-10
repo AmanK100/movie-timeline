@@ -38,14 +38,14 @@ export const oscarMasterList = [
     ceremonyNumber: 94, ceremonyYear: 2022, filmYear: 2021,
     bestPicture: mkMovie(2021, "bestPicture", "CODA"),
     bestInternational: mkMovie(2021, "bestInternational", "Drive My Car"),
-    highestRatedEnglish: mkMovie(2021, "highestRatedEnglish", "Spider-Man: No Way Home"),
+    highestRatedEnglish: mkMovie(2021, "highestRatedEnglish", "Marcel the Shell with Shoes On"),
     highestRatedInternational: mkMovie(2021, "highestRatedInternational", "Drive My Car")
   },
   {
     ceremonyNumber: 93, ceremonyYear: 2021, filmYear: 2020,
     bestPicture: mkMovie(2020, "bestPicture", "Nomadland"),
     bestInternational: mkMovie(2020, "bestInternational", "Another Round"),
-    highestRatedEnglish: mkMovie(2020, "highestRatedEnglish", "Soul"),
+    highestRatedEnglish: mkMovie(2020, "highestRatedEnglish", "The Father"),
     highestRatedInternational: mkMovie(2020, "highestRatedInternational", "Demon Slayer: Mugen Train")
   },
 
@@ -56,7 +56,7 @@ export const oscarMasterList = [
     ceremonyNumber: 92, ceremonyYear: 2020, filmYear: 2019,
     bestPicture: mkMovie(2019, "bestPicture", "Parasite"),
     bestInternational: mkMovie(2019, "bestInternational", "Parasite"),
-    highestRatedEnglish: mkMovie(2019, "highestRatedEnglish", "Joker"),
+    highestRatedEnglish: mkMovie(2019, "highestRatedEnglish", "Sound of Metal"),
     highestRatedInternational: mkMovie(2019, "highestRatedInternational", "Parasite")
   },
   {
@@ -70,14 +70,14 @@ export const oscarMasterList = [
     ceremonyNumber: 90, ceremonyYear: 2018, filmYear: 2017,
     bestPicture: mkMovie(2017, "bestPicture", "The Shape of Water"),
     bestInternational: mkMovie(2017, "bestInternational", "A Fantastic Woman"),
-    highestRatedEnglish: mkMovie(2017, "highestRatedEnglish", "Coco"),
+    highestRatedEnglish: mkMovie(2017, "highestRatedEnglish", "Phantom Thread"),
     highestRatedInternational: mkMovie(2017, "highestRatedInternational", "Paddington 2")
   },
   {
     ceremonyNumber: 89, ceremonyYear: 2017, filmYear: 2016,
     bestPicture: mkMovie(2016, "bestPicture", "Moonlight"),
     bestInternational: mkMovie(2016, "bestInternational", "The Salesman"),
-    highestRatedEnglish: mkMovie(2016, "highestRatedEnglish", "La La Land"),
+    highestRatedEnglish: mkMovie(2016, "highestRatedEnglish", "Moonlight"),
     highestRatedInternational: mkMovie(2016, "highestRatedInternational", "Your Name")
   },
   {
@@ -91,28 +91,28 @@ export const oscarMasterList = [
     ceremonyNumber: 87, ceremonyYear: 2015, filmYear: 2014,
     bestPicture: mkMovie(2014, "bestPicture", "Birdman"),
     bestInternational: mkMovie(2014, "bestInternational", "Ida"),
-    highestRatedEnglish: mkMovie(2014, "highestRatedEnglish", "Whiplash"),
+    highestRatedEnglish: mkMovie(2014, "highestRatedEnglish", "Interstellar"),
     highestRatedInternational: mkMovie(2014, "highestRatedInternational", "Wild Tales")
   },
   {
     ceremonyNumber: 86, ceremonyYear: 2014, filmYear: 2013,
     bestPicture: mkMovie(2013, "bestPicture", "12 Years a Slave"),
     bestInternational: mkMovie(2013, "bestInternational", "The Great Beauty"),
-    highestRatedEnglish: mkMovie(2013, "highestRatedEnglish", "Interstellar"),
+    highestRatedEnglish: mkMovie(2013, "highestRatedEnglish", "Prisoners"),
     highestRatedInternational: mkMovie(2013, "highestRatedInternational", "The Tale of the Princess Kaguya")
   },
   {
     ceremonyNumber: 85, ceremonyYear: 2013, filmYear: 2012,
     bestPicture: mkMovie(2012, "bestPicture", "Argo"),
     bestInternational: mkMovie(2012, "bestInternational", "Amour"),
-    highestRatedEnglish: mkMovie(2012, "highestRatedEnglish", "The Dark Knight Rises"),
+    highestRatedEnglish: mkMovie(2012, "highestRatedEnglish", "It's Such a Beautiful Day"),
     highestRatedInternational: mkMovie(2012, "highestRatedInternational", "The Hunt")
   },
   {
     ceremonyNumber: 84, ceremonyYear: 2012, filmYear: 2011,
     bestPicture: mkMovie(2011, "bestPicture", "The Artist"),
     bestInternational: mkMovie(2011, "bestInternational", "A Separation"),
-    highestRatedEnglish: mkMovie(2011, "highestRatedEnglish", "Harry Potter and the Deathly Hallows: Part 2"),
+    highestRatedEnglish: mkMovie(2011, "highestRatedEnglish", "Warrior"),
     highestRatedInternational: mkMovie(2011, "highestRatedInternational", "A Separation")
   },
   {
@@ -151,21 +151,21 @@ export const oscarMasterList = [
     ceremonyNumber: 79, ceremonyYear: 2007, filmYear: 2006,
     bestPicture: mkMovie(2006, "bestPicture", "The Departed"),
     bestInternational: mkMovie(2006, "bestInternational", "The Lives of Others"),
-    highestRatedEnglish: mkMovie(2006, "highestRatedEnglish", "The Prestige"),
+    highestRatedEnglish: mkMovie(2006, "highestRatedEnglish", "The Departed"),
     highestRatedInternational: mkMovie(2006, "highestRatedInternational", "Pan's Labyrinth")
   },
   {
     ceremonyNumber: 78, ceremonyYear: 2006, filmYear: 2005,
     bestPicture: mkMovie(2005, "bestPicture", "Crash"),
     bestInternational: mkMovie(2005, "bestInternational", "Tsotsi"),
-    highestRatedEnglish: mkMovie(2005, "highestRatedEnglish", "V for Vendetta"),
+    highestRatedEnglish: mkMovie(2005, "highestRatedEnglish", "Brokeback Mountain"),
     highestRatedInternational: mkMovie(2005, "highestRatedInternational", "Cache")
   },
   {
     ceremonyNumber: 77, ceremonyYear: 2005, filmYear: 2004,
     bestPicture: mkMovie(2004, "bestPicture", "Million Dollar Baby"),
     bestInternational: mkMovie(2004, "bestInternational", "The Sea Inside"),
-    highestRatedEnglish: mkMovie(2004, "highestRatedEnglish", "Eternal Sunshine of the Spotless Mind"),
+    highestRatedEnglish: mkMovie(2004, "highestRatedEnglish", "Before Sunset"),
     highestRatedInternational: mkMovie(2004, "highestRatedInternational", "Downfall")
   },
   {
@@ -211,7 +211,7 @@ export const oscarMasterList = [
     ceremonyNumber: 71, ceremonyYear: 1999, filmYear: 1998,
     bestPicture: mkMovie(1998, "bestPicture", "Shakespeare in Love"),
     bestInternational: mkMovie(1998, "bestInternational", "Life Is Beautiful"),
-    highestRatedEnglish: mkMovie(1998, "highestRatedEnglish", "The Truman Show"),
+    highestRatedEnglish: mkMovie(1998, "highestRatedEnglish", "Saving Private Ryan"),
     highestRatedInternational: mkMovie(1998, "highestRatedInternational", "Festen")
   },
   {
@@ -225,7 +225,7 @@ export const oscarMasterList = [
     ceremonyNumber: 69, ceremonyYear: 1997, filmYear: 1996,
     bestPicture: mkMovie(1996, "bestPicture", "The English Patient"),
     bestInternational: mkMovie(1996, "bestInternational", "Kolya"),
-    highestRatedEnglish: mkMovie(1996, "highestRatedEnglish", "Fargo"),
+    highestRatedEnglish: mkMovie(1996, "highestRatedEnglish", "Secrets & Lies"),
     highestRatedInternational: mkMovie(1996, "highestRatedInternational", "A Moment of Innocence")
   },
   {
@@ -253,7 +253,7 @@ export const oscarMasterList = [
     ceremonyNumber: 65, ceremonyYear: 1993, filmYear: 1992,
     bestPicture: mkMovie(1992, "bestPicture", "Unforgiven"),
     bestInternational: mkMovie(1992, "bestInternational", "Indochine"),
-    highestRatedEnglish: mkMovie(1992, "highestRatedEnglish", "Reservoir Dogs"),
+    highestRatedEnglish: mkMovie(1992, "highestRatedEnglish", "Twin Peaks: Fire Walk with Me"),
     highestRatedInternational: mkMovie(1992, "highestRatedInternational", "Baraka")
   },
   {
@@ -313,7 +313,7 @@ export const oscarMasterList = [
     ceremonyNumber: 57, ceremonyYear: 1985, filmYear: 1984,
     bestPicture: mkMovie(1984, "bestPicture", "Amadeus"),
     bestInternational: mkMovie(1984, "bestInternational", "Dangerous Moves"),
-    highestRatedEnglish: mkMovie(1984, "highestRatedEnglish", "Amadeus"),
+    highestRatedEnglish: mkMovie(1984, "highestRatedEnglish", "Paris, Texas"),
     highestRatedInternational: mkMovie(1984, "highestRatedInternational", "Nausicaä of the Valley of the Wind")
   },
   {
@@ -359,28 +359,28 @@ export const oscarMasterList = [
     ceremonyNumber: 51, ceremonyYear: 1979, filmYear: 1978,
     bestPicture: mkMovie(1978, "bestPicture", "The Deer Hunter"),
     bestInternational: mkMovie(1978, "bestInternational", "Get Out Your Handkerchiefs"),
-    highestRatedEnglish: mkMovie(1978, "highestRatedEnglish", "Dawn of the Dead"),
+    highestRatedEnglish: mkMovie(1978, "highestRatedEnglish", "The Deer Hunter"),
     highestRatedInternational: mkMovie(1978, "highestRatedInternational", "Autumn Sonata")
   },
   {
     ceremonyNumber: 50, ceremonyYear: 1978, filmYear: 1977,
     bestPicture: mkMovie(1977, "bestPicture", "Annie Hall"),
     bestInternational: mkMovie(1977, "bestInternational", "Madame Rosa"),
-    highestRatedEnglish: mkMovie(1977, "highestRatedEnglish", "Star Wars"),
+    highestRatedEnglish: mkMovie(1977, "highestRatedEnglish", "Opening Night"),
     highestRatedInternational: mkMovie(1977, "highestRatedInternational", "Suspiria")
   },
   {
     ceremonyNumber: 49, ceremonyYear: 1977, filmYear: 1976,
     bestPicture: mkMovie(1976, "bestPicture", "Rocky"),
     bestInternational: mkMovie(1976, "bestInternational", "Black and White in Color"),
-    highestRatedEnglish: mkMovie(1976, "highestRatedEnglish", "Taxi Driver"),
+    highestRatedEnglish: mkMovie(1976, "highestRatedEnglish", "Network"),
     highestRatedInternational: mkMovie(1976, "highestRatedInternational", "In the Realm of the Senses")
   },
   {
     ceremonyNumber: 48, ceremonyYear: 1976, filmYear: 1975,
     bestPicture: mkMovie(1975, "bestPicture", "One Flew Over the Cuckoo's Nest"),
     bestInternational: mkMovie(1975, "bestInternational", "Dersu Uzala"),
-    highestRatedEnglish: mkMovie(1975, "highestRatedEnglish", "One Flew Over the Cuckoo's Nest"),
+    highestRatedEnglish: mkMovie(1975, "highestRatedEnglish", "Barry Lyndon"),
     highestRatedInternational: mkMovie(1975, "highestRatedInternational", "Mirror")
   },
   {
@@ -408,7 +408,7 @@ export const oscarMasterList = [
     ceremonyNumber: 44, ceremonyYear: 1972, filmYear: 1971,
     bestPicture: mkMovie(1971, "bestPicture", "The French Connection"),
     bestInternational: mkMovie(1971, "bestInternational", "The Garden of the Finzi-Continis"),
-    highestRatedEnglish: mkMovie(1971, "highestRatedEnglish", "A Clockwork Orange"),
+    highestRatedEnglish: mkMovie(1971, "highestRatedEnglish", "The Devils"),
     highestRatedInternational: mkMovie(1971, "highestRatedInternational", "A Touch of Zen")
   },
   {
@@ -426,21 +426,21 @@ export const oscarMasterList = [
     ceremonyNumber: 42, ceremonyYear: 1970, filmYear: 1969,
     bestPicture: mkMovie(1969, "bestPicture", "Midnight Cowboy"),
     bestInternational: mkMovie(1969, "bestInternational", "Z"),
-    highestRatedEnglish: mkMovie(1969, "highestRatedEnglish", "Butch Cassidy and the Sundance Kid"),
+    highestRatedEnglish: mkMovie(1969, "highestRatedEnglish", "Kes"),
     highestRatedInternational: mkMovie(1969, "highestRatedInternational", "Army of Shadows")
   },
   {
     ceremonyNumber: 41, ceremonyYear: 1969, filmYear: 1968,
     bestPicture: mkMovie(1968, "bestPicture", "Oliver!"),
     bestInternational: mkMovie(1968, "bestInternational", "War and Peace"),
-    highestRatedEnglish: mkMovie(1968, "highestRatedEnglish", "2001: A Space Odyssey"),
+    highestRatedEnglish: mkMovie(1968, "highestRatedEnglish", "Once Upon a Time in the West"),
     highestRatedInternational: mkMovie(1968, "highestRatedInternational", "Once Upon a Time in the West")
   },
   {
     ceremonyNumber: 40, ceremonyYear: 1968, filmYear: 1967,
     bestPicture: mkMovie(1967, "bestPicture", "In the Heat of the Night"),
     bestInternational: mkMovie(1967, "bestInternational", "Closely Watched Trains"),
-    highestRatedEnglish: mkMovie(1967, "highestRatedEnglish", "The Graduate"),
+    highestRatedEnglish: mkMovie(1967, "highestRatedEnglish", "Cool Hand Luke"),
     highestRatedInternational: mkMovie(1967, "highestRatedInternational", "Playtime")
   },
   {
@@ -482,14 +482,14 @@ export const oscarMasterList = [
     ceremonyNumber: 34, ceremonyYear: 1962, filmYear: 1961,
     bestPicture: mkMovie(1961, "bestPicture", "West Side Story"),
     bestInternational: mkMovie(1961, "bestInternational", "Through a Glass Darkly"),
-    highestRatedEnglish: mkMovie(1961, "highestRatedEnglish", "The Judgment at Nuremberg"),
+    highestRatedEnglish: mkMovie(1961, "highestRatedEnglish", "Judgment at Nuremberg"),
     highestRatedInternational: mkMovie(1961, "highestRatedInternational", "Yojimbo")
   },
   {
     ceremonyNumber: 33, ceremonyYear: 1961, filmYear: 1960,
     bestPicture: mkMovie(1960, "bestPicture", "The Apartment"),
     bestInternational: mkMovie(1960, "bestInternational", "The Virgin Spring"),
-    highestRatedEnglish: mkMovie(1960, "highestRatedEnglish", "Psycho"),
+    highestRatedEnglish: mkMovie(1960, "highestRatedEnglish", "The Apartment"),
     highestRatedInternational: mkMovie(1960, "highestRatedInternational", "Le Trou")
   },
 
@@ -521,7 +521,7 @@ export const oscarMasterList = [
     ceremonyNumber: 29, ceremonyYear: 1957, filmYear: 1956,
     bestPicture: mkMovie(1956, "bestPicture", "Around the World in 80 Days"),
     bestInternational: mkMovie(1956, "bestInternational", "La Strada"),
-    highestRatedEnglish: mkMovie(1956, "highestRatedEnglish", "The Searchers"),
+    highestRatedEnglish: mkMovie(1956, "highestRatedEnglish", "Tea and Sympathy"),
     highestRatedInternational: mkMovie(1956, "highestRatedInternational", "A Man Escaped")
   },
   {
@@ -556,7 +556,7 @@ export const oscarMasterList = [
     ceremonyNumber: 24, ceremonyYear: 1952, filmYear: 1951,
     bestPicture: mkMovie(1951, "bestPicture", "An American in Paris"),
     bestInternational: mkMovie(1951, "bestInternational", "Rashomon"),
-    highestRatedEnglish: mkMovie(1951, "highestRatedEnglish", "A Streetcar Named Desire"),
+    highestRatedEnglish: mkMovie(1951, "highestRatedEnglish", "Ace in the Hole"),
     highestRatedInternational: mkMovie(1951, "highestRatedInternational", "Diary of a Country Priest")
   },
   {
