@@ -160,15 +160,22 @@ const SingleYearView = ({ year, onBack }) => {
 // ==========================================
 const Timeline = ({ startDecade, onBack, onSelectYear }) => {
   const scrollRef = useRef(null);
-  const ITEM_WIDTH = 300; // Width of each year container
+  const ITEM_WIDTH = 300; 
 
   useEffect(() => {
+    // If we have a target decade/year to jump to
     if (scrollRef.current && startDecade) {
       const yearElement = document.getElementById(`year-${startDecade}`);
       if (yearElement) {
         const container = scrollRef.current;
         const scrollLeft = yearElement.offsetLeft - (container.clientWidth / 2) + (yearElement.clientWidth / 2);
-        container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+        
+        // CHANGED: 'smooth' -> 'auto'
+        // This makes it jump instantly so you don't see the long scroll animation
+        container.scrollTo({ 
+          left: scrollLeft, 
+          behavior: 'auto' 
+        });
       }
     }
   }, [startDecade]);
@@ -195,10 +202,6 @@ const Timeline = ({ startDecade, onBack, onSelectYear }) => {
         ref={scrollRef}
         className="flex-1 overflow-x-auto no-scrollbar flex items-center relative snap-x snap-mandatory cursor-grab active:cursor-grabbing"
       >
-        {/* THE FIX:
-           1. left: calc(50vw + 150px) -> Starts line exactly at the center of the first year
-           2. width: (Length - 1) * Width -> Ends line exactly at the center of the last year
-        */}
         <div 
           className="absolute top-1/2 h-0.5 bg-white/20" 
           style={{ 
