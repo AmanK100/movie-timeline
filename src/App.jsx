@@ -130,6 +130,7 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
 
   const paddingStyle = { paddingInline: `calc(50vw - ${ITEM_WIDTH / 2}px)` };
 
+  // INITIAL SCROLL (Instant Teleport)
   useEffect(() => {
     const targetId = focusYear ? `year-${focusYear}` : (startDecade ? `year-${startDecade}` : null);
     if (scrollRef.current && targetId) {
@@ -137,7 +138,6 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
       if (targetElement) {
         const container = scrollRef.current;
         const scrollLeft = targetElement.offsetLeft - (container.clientWidth / 2) + (ITEM_WIDTH / 2);
-        
         container.scrollTo({ left: scrollLeft, behavior: 'auto' });
         
         const yearNum = parseInt(targetId.split('-')[1]);
@@ -146,6 +146,7 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
     }
   }, [startDecade, focusYear]);
 
+  // SCROLL LISTENER (Track Center)
   const handleScroll = () => {
     if (scrollRef.current) {
       const scrollLeft = scrollRef.current.scrollLeft;
@@ -158,6 +159,36 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
     }
   };
 
+  // JUMP HANDLER
+  const handleJumpDecade = (direction) => {
+    if (!activeYear || !scrollRef.current) return;
+
+    // Calculate current decade floor (e.g., 1954 -> 1950)
+    const currentDecadeStart = Math.floor(activeYear / 10) * 10;
+    
+    let targetYear;
+    if (direction === 'next') {
+        // If we are exactly on a decade (e.g., 1950), go to 1960. 
+        // If we are at 1954, go to 1960.
+        targetYear = currentDecadeStart + 10;
+    } else {
+        // If we are exactly on a decade (e.g., 1960), go to 1950.
+        // If we are at 1954, go to 1950.
+        targetYear = (activeYear === currentDecadeStart) ? currentDecadeStart - 10 : currentDecadeStart;
+    }
+
+    // Clamp to bounds
+    if (targetYear < START_YEAR) targetYear = START_YEAR;
+    if (targetYear > END_YEAR) targetYear = 2020; // Cap at 2020s start for navigation purposes
+
+    const targetElement = document.getElementById(`year-${targetYear}`);
+    if (targetElement) {
+      const container = scrollRef.current;
+      const scrollLeft = targetElement.offsetLeft - (container.clientWidth / 2) + (ITEM_WIDTH / 2);
+      container.scrollTo({ left: scrollLeft, behavior: 'smooth' }); // Smooth fast scroll
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -165,6 +196,7 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
       exit={{ opacity: 0 }}
       className="w-full h-full bg-neutral-950 flex flex-col"
     >
+      {/* HEADER NAV */}
       <div className="fixed top-0 left-0 w-full p-8 z-50 flex justify-between items-center pointer-events-none">
         <button 
           onClick={onBack}
@@ -177,12 +209,39 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
         </h1>
       </div>
 
+      {/* FOOTER NAV (Previous / Next Decade) */}
+      <div className="fixed bottom-0 left-0 w-full p-8 z-50 flex justify-between items-end pointer-events-none">
+        {/* PREV DECADE BUTTON */}
+        <div className="pointer-events-auto">
+          {activeYear > 1959 && (
+            <button 
+              onClick={() => handleJumpDecade('prev')}
+              className="text-white/40 hover:text-white font-mono text-sm uppercase tracking-[0.2em] transition-colors"
+            >
+              ← Previous Decade
+            </button>
+          )}
+        </div>
+
+        {/* NEXT DECADE BUTTON */}
+        <div className="pointer-events-auto">
+          {activeYear < 2020 && (
+            <button 
+              onClick={() => handleJumpDecade('next')}
+              className="text-white/40 hover:text-white font-mono text-sm uppercase tracking-[0.2em] transition-colors"
+            >
+              Next Decade →
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* SCROLL CONTAINER */}
       <div 
         ref={scrollRef}
         onScroll={handleScroll}
         className="flex-1 overflow-x-auto no-scrollbar flex items-center relative snap-x snap-mandatory cursor-grab active:cursor-grabbing"
       >
-        {/* Central Line - MOVED UP to 38% */}
         <div 
           className="absolute top-[38%] h-0.5 bg-white/20" 
           style={{ 
@@ -201,22 +260,17 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
                 key={year}
                 id={`year-${year}`}
                 onClick={() => isActive && onSelectYear(year)}
-                // Flex centered (items-center justify-center) guarantees vertical centering
-                className={`relative flex flex-col items-center justify-center shrink-0 h-full snap-center transition-all duration-300
+                className={`relative flex flex-col justify-center items-center shrink-0 h-full snap-center transition-all duration-300
                   ${isActive ? 'cursor-pointer opacity-100' : 'cursor-default opacity-20 scale-90'}
                 `}
                 style={{ width: `${ITEM_WIDTH}px` }}
               >
-                {/* Visuals (Absolute to avoid pushing text) */}
                 <div className="absolute top-[38%] w-full flex flex-col items-center">
-                   {/* Dot */}
                    <div 
                     className={`absolute -translate-y-1/2 w-3 h-3 border-2 border-white rounded-full transition-all duration-300 z-10
                       ${isActive ? 'bg-white scale-150' : 'bg-black'}
                     `} 
                   />
-                  
-                  {/* Vertical Line hanging down */}
                   <div 
                     className={`w-0.5 transition-all duration-300 bg-white origin-top
                       ${isDecade ? 'h-10' : 'h-5'} 
@@ -225,11 +279,20 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
                   />
                 </div>
                 
-                {/* YEAR TEXT - Centered by flex parent */}
-                {/* No top margin needed anymore, or just a small one if you want spacing from the tick */}
-                <h3 className={`${YEAR_FONT_CLASS} text-white mt-16`}>
-                  {year}
-                </h3>
+                <div className="pt-24"> 
+                  {isActive ? (
+                    <motion.h3 
+                      layoutId={`year-text-${year}`}
+                      className={`${YEAR_FONT_CLASS} text-white`}
+                    >
+                      {year}
+                    </motion.h3>
+                  ) : (
+                    <h3 className={`${YEAR_FONT_CLASS} text-white`}>
+                      {year}
+                    </h3>
+                  )}
+                </div>
               </div>
             );
           })}
