@@ -3,6 +3,7 @@
 // Helper to generate consistent paths
 const mkMovie = (year, key, title) => ({
   title: title,
+  artwork: `/images/${year}/${key}_artwork.jpg`,
   poster: `/images/${year}/${key}_poster.jpg`,
   still: `/images/${year}/${key}_still.jpg`,
   description: "", 
