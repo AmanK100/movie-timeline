@@ -10,6 +10,9 @@ const END_YEAR = 2024;
 const YEARS = Array.from({ length: END_YEAR - START_YEAR + 1 }, (_, i) => START_YEAR + i);
 const ITEM_WIDTH = 300; 
 
+// SHARED FONT CLASS (Ensures exact match between views)
+const YEAR_FONT_CLASS = "font-mono text-5xl md:text-6xl font-bold tracking-tighter select-none";
+
 // ==========================================
 // COMPONENT: ARTWORK QUADRANT
 // ==========================================
@@ -31,7 +34,7 @@ const ArtworkQuadrant = ({ label, movieData, dataKey, isSpecial, onClick }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
+      transition={{ duration: 0.5 }} // Standard fade
       onClick={onClick}
       className="relative w-full h-full bg-neutral-900 overflow-hidden cursor-pointer group"
     >
@@ -94,6 +97,7 @@ const SingleYearView = ({ year, onBack }) => {
 
   return (
     <div className="relative w-screen h-screen bg-black overflow-hidden">
+      {/* 2x2 Grid */}
       <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
         <ArtworkQuadrant label="Best Picture" dataKey="bestPicture" movieData={yearData.bestPicture} isSpecial={isSpecial(yearData.bestPicture)} onClick={() => handleClick("Best Picture", yearData.bestPicture)} />
         <ArtworkQuadrant label="Audience (Eng)" dataKey="highestRatedEnglish" movieData={yearData.highestRatedEnglish} isSpecial={isSpecial(yearData.highestRatedEnglish)} onClick={() => handleClick("Audience English", yearData.highestRatedEnglish)} />
@@ -101,17 +105,17 @@ const SingleYearView = ({ year, onBack }) => {
         <ArtworkQuadrant label="Audience (Intl)" dataKey="highestRatedInternational" movieData={yearData.highestRatedInternational} isSpecial={isSpecial(yearData.highestRatedInternational)} onClick={() => handleClick("Audience Intl", yearData.highestRatedInternational)} />
       </div>
 
+      {/* CENTER YEAR BUTTON */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <motion.button
+        <button
           onClick={onBack}
-          layoutId={`year-text-${year}`}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="pointer-events-auto cursor-pointer z-50 group hover:scale-105 transition-transform duration-300"
         >
-          <span className="text-white font-black text-6xl md:text-9xl tracking-tighter drop-shadow-2xl">
+          {/* STATIC TEXT (No layoutId) */}
+          <span className={`${YEAR_FONT_CLASS} text-white drop-shadow-2xl`}>
             {year}
           </span>
-        </motion.button>
+        </button>
       </div>
     </div>
   );
@@ -124,7 +128,6 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
   const scrollRef = useRef(null);
   const [activeYear, setActiveYear] = useState(null);
 
-  // Center alignment logic
   const paddingStyle = { paddingInline: `calc(50vw - ${ITEM_WIDTH / 2}px)` };
 
   useEffect(() => {
@@ -179,8 +182,9 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
         onScroll={handleScroll}
         className="flex-1 overflow-x-auto no-scrollbar flex items-center relative snap-x snap-mandatory cursor-grab active:cursor-grabbing"
       >
+        {/* Central Line - MOVED UP to 38% */}
         <div 
-          className="absolute top-1/2 h-0.5 bg-white/20" 
+          className="absolute top-[38%] h-0.5 bg-white/20" 
           style={{ 
             left: '50vw', 
             width: `${(YEARS.length - 1) * ITEM_WIDTH}px` 
@@ -197,39 +201,35 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
                 key={year}
                 id={`year-${year}`}
                 onClick={() => isActive && onSelectYear(year)}
+                // Flex centered (items-center justify-center) guarantees vertical centering
                 className={`relative flex flex-col items-center justify-center shrink-0 h-full snap-center transition-all duration-300
-                  ${isActive ? 'cursor-pointer opacity-100 scale-110' : 'cursor-default opacity-20 scale-90'}
+                  ${isActive ? 'cursor-pointer opacity-100' : 'cursor-default opacity-20 scale-90'}
                 `}
                 style={{ width: `${ITEM_WIDTH}px` }}
               >
-                {/* Vertical Line */}
-                <div 
-                  className={`w-0.5 transition-all duration-300 bg-white
-                    ${isDecade ? 'h-24' : 'h-12'}
-                    ${isActive ? 'h-40' : ''} 
-                  `} 
-                />
+                {/* Visuals (Absolute to avoid pushing text) */}
+                <div className="absolute top-[38%] w-full flex flex-col items-center">
+                   {/* Dot */}
+                   <div 
+                    className={`absolute -translate-y-1/2 w-3 h-3 border-2 border-white rounded-full transition-all duration-300 z-10
+                      ${isActive ? 'bg-white scale-150' : 'bg-black'}
+                    `} 
+                  />
+                  
+                  {/* Vertical Line hanging down */}
+                  <div 
+                    className={`w-0.5 transition-all duration-300 bg-white origin-top
+                      ${isDecade ? 'h-10' : 'h-5'} 
+                      ${isActive ? 'h-16' : ''} 
+                    `} 
+                  />
+                </div>
                 
-                {/* Dot */}
-                <div 
-                  className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-white rounded-full transition-all duration-300 z-10
-                    ${isActive ? 'bg-white scale-150' : 'bg-black'}
-                  `} 
-                />
-                
-                {/* Year Text */}
-                {isActive ? (
-                  <motion.h3 
-                    layoutId={`year-text-${year}`}
-                    className="mt-8 font-mono text-6xl font-black text-white select-none"
-                  >
-                    {year}
-                  </motion.h3>
-                ) : (
-                  <h3 className="mt-8 font-mono text-5xl font-normal text-white select-none">
-                    {year}
-                  </h3>
-                )}
+                {/* YEAR TEXT - Centered by flex parent */}
+                {/* No top margin needed anymore, or just a small one if you want spacing from the tick */}
+                <h3 className={`${YEAR_FONT_CLASS} text-white mt-16`}>
+                  {year}
+                </h3>
               </div>
             );
           })}
