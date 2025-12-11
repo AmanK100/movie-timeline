@@ -12,23 +12,36 @@ const YEARS = Array.from({ length: END_YEAR - START_YEAR + 1 }, (_, i) => START_
 // ==========================================
 // COMPONENT: ARTWORK QUADRANT STUB
 // ==========================================
-const ArtworkQuadrant = ({ label, movieData, onClick }) => {
+const ArtworkQuadrant = ({ label, movieData, dataKey, isSpecial, onClick }) => {
   const [imgError, setImgError] = useState(false);
-  const imgSrc = movieData ? (movieData.artwork || movieData.poster) : null;
+  
+  // DYNAMIC IMAGE LOGIC
+  // Even though it looks the same, we still check for the '_special.jpg' file
+  // so you can use a different image file for the duplicate entry if you want.
+  let imgSrc = null;
+  if (movieData) {
+    const year = movieData.poster.split('/')[2]; 
+    
+    if (isSpecial && !imgError) {
+      imgSrc = `/images/${year}/${dataKey}_special.jpg`;
+    } else {
+      imgSrc = movieData.artwork || movieData.poster;
+    }
+  }
 
   return (
     <div 
       onClick={onClick}
       className="relative w-full h-full bg-neutral-900 overflow-hidden cursor-pointer group"
     >
-      {/* Image Layer: Starts dimmed, brightens on hover */}
+      {/* Image Layer */}
       <div className="absolute inset-0 transition-all duration-500 ease-in-out filter brightness-50 group-hover:brightness-100 group-hover:scale-105">
         {!imgError && imgSrc ? (
           <img 
             src={imgSrc} 
             alt={label} 
             className="w-full h-full object-cover"
-            onError={() => setImgError(true)}
+            onError={() => setImgError(true)} 
           />
         ) : (
           // Fallback Pattern
@@ -38,9 +51,9 @@ const ArtworkQuadrant = ({ label, movieData, onClick }) => {
         )}
       </div>
 
-      {/* Label: Hidden by default, appears on hover */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-        <span className="text-white font-mono text-sm md:text-xl font-bold uppercase tracking-widest border-2 border-white/50 bg-black/50 backdrop-blur-md px-4 py-2">
+      {/* Label: Standard white look for everyone */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 p-4 text-center">
+        <span className="font-mono text-sm md:text-xl font-bold uppercase tracking-widest border-2 border-white/50 bg-black/50 text-white backdrop-blur-md px-4 py-2">
           {label}
         </span>
       </div>
@@ -49,7 +62,7 @@ const ArtworkQuadrant = ({ label, movieData, onClick }) => {
 };
 
 // ==========================================
-// COMPONENT: SINGLE YEAR GRID VIEW (Updated Button)
+// COMPONENT: SINGLE YEAR GRID VIEW
 // ==========================================
 const SingleYearView = ({ year, onBack }) => {
   const yearData = useMemo(() => {
@@ -57,7 +70,34 @@ const SingleYearView = ({ year, onBack }) => {
     return allData.find(item => item.filmYear === year);
   }, [year]);
 
+  // DUPLICATE DETECTION LOGIC
+  const specials = useMemo(() => {
+    if (!yearData) return new Set();
+    const titles = [
+      yearData.bestPicture?.title,
+      yearData.highestRatedEnglish?.title,
+      yearData.bestInternational?.title,
+      yearData.highestRatedInternational?.title
+    ].filter(Boolean);
+
+    const duplicates = titles.filter((item, index) => titles.indexOf(item) !== index);
+    return new Set(duplicates);
+  }, [yearData]);
+
   if (!yearData) return <div className="text-white p-10">Data not found for {year}</div>;
+
+  const isSpecial = (movie) => movie && specials.has(movie.title);
+
+  // CLICK HANDLER
+  // This is where you will add navigation logic later.
+  // For now, it just logs differently so you know it worked.
+  const handleClick = (category, movie) => {
+    if (isSpecial(movie)) {
+      console.log(`Open SPOTLIGHT Page for: ${movie.title} (${category})`);
+    } else {
+      console.log(`Open Standard Movie Page: ${category}`);
+    }
+  };
 
   return (
     <motion.div 
@@ -68,17 +108,40 @@ const SingleYearView = ({ year, onBack }) => {
     >
       {/* 2x2 Grid */}
       <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
-        <ArtworkQuadrant label="Best Picture" movieData={yearData.bestPicture} onClick={() => console.log("Open BP")} />
-        <ArtworkQuadrant label="Audience (Eng)" movieData={yearData.highestRatedEnglish} onClick={() => console.log("Open AudEng")} />
-        <ArtworkQuadrant label="Best International" movieData={yearData.bestInternational} onClick={() => console.log("Open BI")} />
-        <ArtworkQuadrant label="Audience (Intl)" movieData={yearData.highestRatedInternational} onClick={() => console.log("Open AudIntl")} />
+        <ArtworkQuadrant 
+          label="Best Picture" 
+          dataKey="bestPicture"
+          movieData={yearData.bestPicture} 
+          isSpecial={isSpecial(yearData.bestPicture)}
+          onClick={() => handleClick("Best Picture", yearData.bestPicture)} 
+        />
+        <ArtworkQuadrant 
+          label="Audience (Eng)" 
+          dataKey="highestRatedEnglish"
+          movieData={yearData.highestRatedEnglish} 
+          isSpecial={isSpecial(yearData.highestRatedEnglish)}
+          onClick={() => handleClick("Audience English", yearData.highestRatedEnglish)} 
+        />
+        <ArtworkQuadrant 
+          label="Best International" 
+          dataKey="bestInternational"
+          movieData={yearData.bestInternational} 
+          isSpecial={isSpecial(yearData.bestInternational)}
+          onClick={() => handleClick("Best International", yearData.bestInternational)} 
+        />
+        <ArtworkQuadrant 
+          label="Audience (Intl)" 
+          dataKey="highestRatedInternational"
+          movieData={yearData.highestRatedInternational} 
+          isSpecial={isSpecial(yearData.highestRatedInternational)}
+          onClick={() => handleClick("Audience Intl", yearData.highestRatedInternational)} 
+        />
       </div>
 
-      {/* CENTER YEAR BUTTON (UPDATED DESIGN) */}
+      {/* CENTER YEAR BUTTON */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <button
           onClick={onBack}
-          // REDESIGNED: Sleek black box instead of clunky circle
           className="pointer-events-auto group relative flex items-center justify-center px-6 py-3 bg-black/70 backdrop-blur-md border border-white/10 rounded-lg hover:bg-black hover:border-white/50 hover:scale-105 transition-all duration-300 z-50 shadow-2xl"
         >
           <span className="text-white font-black text-3xl md:text-5xl tracking-tighter group-hover:hidden">
@@ -92,12 +155,12 @@ const SingleYearView = ({ year, onBack }) => {
     </motion.div>
   );
 };
-
 // ==========================================
 // COMPONENT: TIMELINE VIEW
 // ==========================================
 const Timeline = ({ startDecade, onBack, onSelectYear }) => {
   const scrollRef = useRef(null);
+  const ITEM_WIDTH = 300; // Width of each year container
 
   useEffect(() => {
     if (scrollRef.current && startDecade) {
@@ -132,7 +195,17 @@ const Timeline = ({ startDecade, onBack, onSelectYear }) => {
         ref={scrollRef}
         className="flex-1 overflow-x-auto no-scrollbar flex items-center relative snap-x snap-mandatory cursor-grab active:cursor-grabbing"
       >
-        <div className="absolute top-1/2 left-0 h-0.5 bg-white/20" style={{ width: `${YEARS.length * 300}px` }} />
+        {/* THE FIX:
+           1. left: calc(50vw + 150px) -> Starts line exactly at the center of the first year
+           2. width: (Length - 1) * Width -> Ends line exactly at the center of the last year
+        */}
+        <div 
+          className="absolute top-1/2 h-0.5 bg-white/20" 
+          style={{ 
+            left: `calc(50vw + ${ITEM_WIDTH / 2}px)`, 
+            width: `${(YEARS.length - 1) * ITEM_WIDTH}px` 
+          }} 
+        />
 
         <div className="flex px-[50vw]"> 
           {YEARS.map((year) => {
@@ -142,7 +215,8 @@ const Timeline = ({ startDecade, onBack, onSelectYear }) => {
                 key={year}
                 id={`year-${year}`}
                 onClick={() => onSelectYear(year)}
-                className="relative flex flex-col items-center justify-center shrink-0 w-[300px] h-screen snap-center group cursor-pointer"
+                className={`relative flex flex-col items-center justify-center shrink-0 h-screen snap-center group cursor-pointer`}
+                style={{ width: `${ITEM_WIDTH}px` }}
               >
                 <div 
                   className={`w-0.5 transition-all duration-300 bg-white 
@@ -167,7 +241,6 @@ const Timeline = ({ startDecade, onBack, onSelectYear }) => {
     </motion.div>
   );
 };
-
 // ==========================================
 // COMPONENT: DECADE SELECTOR
 // ==========================================
