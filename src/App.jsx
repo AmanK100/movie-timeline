@@ -1,5 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { getProcessedData } from './oscarData';
 
 // ==========================================
 // CONFIGURATION
@@ -7,59 +8,104 @@ import { motion } from 'framer-motion';
 const START_YEAR = 1950;
 const END_YEAR = 2024;
 const YEARS = Array.from({ length: END_YEAR - START_YEAR + 1 }, (_, i) => START_YEAR + i);
-const DECADES = [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020];
 
 // ==========================================
-// COMPONENT: DECADE SELECTOR (HOME)
+// COMPONENT: ARTWORK QUADRANT STUB
 // ==========================================
-const DecadeSelector = ({ onSelect }) => {
+const ArtworkQuadrant = ({ label, movieData, onClick }) => {
+  const [imgError, setImgError] = useState(false);
+  const imgSrc = movieData ? (movieData.artwork || movieData.poster) : null;
+
   return (
-    <div className="w-full h-full flex flex-col md:flex-row bg-neutral-950">
-      {DECADES.map((decade, index) => (
-        <motion.div
-          key={decade}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05 }}
-          onClick={() => onSelect(decade)}
-          className="relative flex-1 group cursor-pointer border-b md:border-b-0 md:border-r border-white/10 hover:bg-neutral-900 transition-colors duration-500 flex items-center justify-center overflow-hidden"
-        >
-          <span className="absolute text-9xl font-black text-white/5 group-hover:text-white/10 transition-colors scale-150 select-none">
-            {decade.toString().slice(2)}
-          </span>
+    <div 
+      onClick={onClick}
+      className="relative w-full h-full bg-neutral-900 overflow-hidden cursor-pointer group"
+    >
+      {/* Image Layer: Starts dimmed, brightens on hover */}
+      <div className="absolute inset-0 transition-all duration-500 ease-in-out filter brightness-50 group-hover:brightness-100 group-hover:scale-105">
+        {!imgError && imgSrc ? (
+          <img 
+            src={imgSrc} 
+            alt={label} 
+            className="w-full h-full object-cover"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          // Fallback Pattern
+          <div className="w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent" 
+               style={{ backgroundSize: '20px 20px', backgroundImage: 'radial-gradient(#555 1px, transparent 1px)' }}
+          />
+        )}
+      </div>
 
-          <div className="z-10 text-center">
-            {/* Logic: Show full "2000s" or short "50s" */}
-            <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tighter group-hover:scale-110 transition-transform duration-300">
-              {decade >= 2000 ? `${decade}s` : `${decade.toString().slice(2)}s`}
-            </h2>
-            <div className="w-0 group-hover:w-full h-0.5 bg-red-600 mt-4 transition-all duration-300 mx-auto" />
-          </div>
-        </motion.div>
-      ))}
+      {/* Label: Hidden by default, appears on hover */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+        <span className="text-white font-mono text-sm md:text-xl font-bold uppercase tracking-widest border-2 border-white/50 bg-black/50 backdrop-blur-md px-4 py-2">
+          {label}
+        </span>
+      </div>
     </div>
   );
 };
 
 // ==========================================
-// COMPONENT: TIMELINE VIEW (Updated)
+// COMPONENT: SINGLE YEAR GRID VIEW (Updated Button)
 // ==========================================
-const Timeline = ({ startDecade, onBack }) => {
+const SingleYearView = ({ year, onBack }) => {
+  const yearData = useMemo(() => {
+    const allData = getProcessedData(1950);
+    return allData.find(item => item.filmYear === year);
+  }, [year]);
+
+  if (!yearData) return <div className="text-white p-10">Data not found for {year}</div>;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 1.1 }}
+      className="relative w-screen h-screen bg-black overflow-hidden"
+    >
+      {/* 2x2 Grid */}
+      <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
+        <ArtworkQuadrant label="Best Picture" movieData={yearData.bestPicture} onClick={() => console.log("Open BP")} />
+        <ArtworkQuadrant label="Audience (Eng)" movieData={yearData.highestRatedEnglish} onClick={() => console.log("Open AudEng")} />
+        <ArtworkQuadrant label="Best International" movieData={yearData.bestInternational} onClick={() => console.log("Open BI")} />
+        <ArtworkQuadrant label="Audience (Intl)" movieData={yearData.highestRatedInternational} onClick={() => console.log("Open AudIntl")} />
+      </div>
+
+      {/* CENTER YEAR BUTTON (UPDATED DESIGN) */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <button
+          onClick={onBack}
+          // REDESIGNED: Sleek black box instead of clunky circle
+          className="pointer-events-auto group relative flex items-center justify-center px-6 py-3 bg-black/70 backdrop-blur-md border border-white/10 rounded-lg hover:bg-black hover:border-white/50 hover:scale-105 transition-all duration-300 z-50 shadow-2xl"
+        >
+          <span className="text-white font-black text-3xl md:text-5xl tracking-tighter group-hover:hidden">
+            {year}
+          </span>
+          <span className="hidden group-hover:block text-white font-bold text-sm uppercase tracking-widest">
+            Back to Timeline
+          </span>
+        </button>
+      </div>
+    </motion.div>
+  );
+};
+
+// ==========================================
+// COMPONENT: TIMELINE VIEW
+// ==========================================
+const Timeline = ({ startDecade, onBack, onSelectYear }) => {
   const scrollRef = useRef(null);
 
-  // Auto-scroll to selected decade
   useEffect(() => {
     if (scrollRef.current && startDecade) {
       const yearElement = document.getElementById(`year-${startDecade}`);
       if (yearElement) {
         const container = scrollRef.current;
-        // Center the target year in the viewport
         const scrollLeft = yearElement.offsetLeft - (container.clientWidth / 2) + (yearElement.clientWidth / 2);
-        
-        container.scrollTo({
-          left: scrollLeft,
-          behavior: 'smooth'
-        });
+        container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
       }
     }
   }, [startDecade]);
@@ -70,7 +116,6 @@ const Timeline = ({ startDecade, onBack }) => {
       animate={{ opacity: 1 }}
       className="w-full h-full bg-neutral-950 flex flex-col"
     >
-      {/* Header */}
       <div className="fixed top-0 left-0 w-full p-8 z-50 flex justify-between items-center pointer-events-none">
         <button 
           onClick={onBack}
@@ -83,18 +128,12 @@ const Timeline = ({ startDecade, onBack }) => {
         </h1>
       </div>
 
-      {/* SCROLL CONTAINER UPDATES:
-         1. Added `snap-x snap-mandatory` for locking.
-         2. Kept `cursor-grab` for mouse drag feel.
-      */}
       <div 
         ref={scrollRef}
         className="flex-1 overflow-x-auto no-scrollbar flex items-center relative snap-x snap-mandatory cursor-grab active:cursor-grabbing"
       >
-        {/* Central Line */}
         <div className="absolute top-1/2 left-0 h-0.5 bg-white/20" style={{ width: `${YEARS.length * 300}px` }} />
 
-        {/* Years Container */}
         <div className="flex px-[50vw]"> 
           {YEARS.map((year) => {
             const isDecade = year % 10 === 0;
@@ -102,24 +141,16 @@ const Timeline = ({ startDecade, onBack }) => {
               <div 
                 key={year}
                 id={`year-${year}`}
-                // Added `snap-center` here to force this div to lock to center
-                className="relative flex flex-col items-center justify-center shrink-0 w-[300px] h-screen snap-center group"
+                onClick={() => onSelectYear(year)}
+                className="relative flex flex-col items-center justify-center shrink-0 w-[300px] h-screen snap-center group cursor-pointer"
               >
-                {/* Tick Mark: Decades are taller, but thickness is same */}
                 <div 
                   className={`w-0.5 transition-all duration-300 bg-white 
                     ${isDecade ? 'h-24 bg-white' : 'h-12 bg-white/50'}
                     group-hover:h-32 group-hover:bg-red-500
                   `} 
                 />
-
-                {/* Dot on the line */}
                 <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-2 border-white rounded-full group-hover:scale-150 group-hover:bg-red-500 group-hover:border-red-500 transition-all duration-300 z-10" />
-
-                {/* Year Number: 
-                    UPDATED: Removed conditional sizing. All years are now text-5xl.
-                    Added opacity difference for non-decades to keep hierarchy clean without size jumping.
-                */}
                 <h3 
                   className={`mt-8 font-mono transition-all duration-300 select-none text-5xl font-bold
                     ${isDecade ? 'text-white' : 'text-white/40'}
@@ -138,25 +169,81 @@ const Timeline = ({ startDecade, onBack }) => {
 };
 
 // ==========================================
+// COMPONENT: DECADE SELECTOR
+// ==========================================
+const DecadeSelector = ({ onSelect }) => {
+  const decades = [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020];
+
+  return (
+    <div className="w-screen h-screen bg-black flex flex-row overflow-hidden">
+      {decades.map((decade, index) => (
+        <motion.div
+          key={decade}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.05 }}
+          onClick={() => onSelect(decade)}
+          className="relative flex-1 group cursor-pointer border-b md:border-b-0 md:border-r border-neutral-800 hover:border-white/100 hover:bg-neutral-900 transition-all duration-300 flex flex-col items-center justify-center overflow-hidden"
+        >
+          <span className="absolute text-9xl font-black text-white/5 group-hover:text-white/10 transition-colors scale-150 select-none pointer-events-none">
+            {decade.toString().slice(2)}
+          </span>
+          <h2 className="text-2xl md:text-5xl font-black text-white uppercase tracking-tighter group-hover:scale-110 transition-transform relative z-10">
+            {decade >= 2000 ? `${decade}s` : `${decade.toString().slice(2)}s`}
+          </h2>
+          <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 pointer-events-none transition-colors" />
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+// ==========================================
 // MAIN APP
 // ==========================================
 function App() {
-  const [view, setView] = useState('home'); 
+  const [view, setView] = useState('home');
   const [selectedDecade, setSelectedDecade] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
 
   const handleDecadeSelect = (decade) => {
     setSelectedDecade(decade);
     setView('timeline');
   };
 
+  const handleYearSelect = (year) => {
+    setSelectedYear(year);
+    setView('year');
+  };
+
+  const handleBackToTimeline = () => {
+    setView('timeline');
+  };
+
+  const handleBackToHome = () => {
+    setView('home');
+    setSelectedDecade(null);
+    setSelectedYear(null);
+  };
+
   return (
     <div className="w-screen h-screen overflow-hidden bg-black text-white">
-      {view === 'home' ? (
+      {view === 'home' && (
         <DecadeSelector onSelect={handleDecadeSelect} />
-      ) : (
+      )}
+      
+      {view === 'timeline' && (
         <Timeline 
           startDecade={selectedDecade} 
-          onBack={() => setView('home')} 
+          onBack={handleBackToHome} 
+          onSelectYear={handleYearSelect}
+        />
+      )}
+
+      {view === 'year' && selectedYear && (
+        <SingleYearView 
+          year={selectedYear} 
+          onBack={handleBackToTimeline} 
         />
       )}
     </div>
