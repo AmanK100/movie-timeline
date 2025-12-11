@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getProcessedData } from './oscarData';
 
 // ==========================================
@@ -8,20 +8,17 @@ import { getProcessedData } from './oscarData';
 const START_YEAR = 1950;
 const END_YEAR = 2024;
 const YEARS = Array.from({ length: END_YEAR - START_YEAR + 1 }, (_, i) => START_YEAR + i);
+const ITEM_WIDTH = 300; 
 
 // ==========================================
-// COMPONENT: ARTWORK QUADRANT STUB
+// COMPONENT: ARTWORK QUADRANT
 // ==========================================
 const ArtworkQuadrant = ({ label, movieData, dataKey, isSpecial, onClick }) => {
   const [imgError, setImgError] = useState(false);
   
-  // DYNAMIC IMAGE LOGIC
-  // Even though it looks the same, we still check for the '_special.jpg' file
-  // so you can use a different image file for the duplicate entry if you want.
   let imgSrc = null;
   if (movieData) {
     const year = movieData.poster.split('/')[2]; 
-    
     if (isSpecial && !imgError) {
       imgSrc = `/images/${year}/${dataKey}_special.jpg`;
     } else {
@@ -30,11 +27,14 @@ const ArtworkQuadrant = ({ label, movieData, dataKey, isSpecial, onClick }) => {
   }
 
   return (
-    <div 
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
       onClick={onClick}
       className="relative w-full h-full bg-neutral-900 overflow-hidden cursor-pointer group"
     >
-      {/* Image Layer */}
       <div className="absolute inset-0 transition-all duration-500 ease-in-out filter brightness-50 group-hover:brightness-100 group-hover:scale-105">
         {!imgError && imgSrc ? (
           <img 
@@ -44,20 +44,18 @@ const ArtworkQuadrant = ({ label, movieData, dataKey, isSpecial, onClick }) => {
             onError={() => setImgError(true)} 
           />
         ) : (
-          // Fallback Pattern
           <div className="w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent" 
                style={{ backgroundSize: '20px 20px', backgroundImage: 'radial-gradient(#555 1px, transparent 1px)' }}
           />
         )}
       </div>
 
-      {/* Label: Standard white look for everyone */}
       <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 p-4 text-center">
         <span className="font-mono text-sm md:text-xl font-bold uppercase tracking-widest border-2 border-white/50 bg-black/50 text-white backdrop-blur-md px-4 py-2">
           {label}
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -70,7 +68,6 @@ const SingleYearView = ({ year, onBack }) => {
     return allData.find(item => item.filmYear === year);
   }, [year]);
 
-  // DUPLICATE DETECTION LOGIC
   const specials = useMemo(() => {
     if (!yearData) return new Set();
     const titles = [
@@ -79,7 +76,6 @@ const SingleYearView = ({ year, onBack }) => {
       yearData.bestInternational?.title,
       yearData.highestRatedInternational?.title
     ].filter(Boolean);
-
     const duplicates = titles.filter((item, index) => titles.indexOf(item) !== index);
     return new Set(duplicates);
   }, [yearData]);
@@ -88,108 +84,88 @@ const SingleYearView = ({ year, onBack }) => {
 
   const isSpecial = (movie) => movie && specials.has(movie.title);
 
-  // CLICK HANDLER
-  // This is where you will add navigation logic later.
-  // For now, it just logs differently so you know it worked.
   const handleClick = (category, movie) => {
     if (isSpecial(movie)) {
-      console.log(`Open SPOTLIGHT Page for: ${movie.title} (${category})`);
+      console.log(`Open SPOTLIGHT Page for: ${movie.title}`);
     } else {
       console.log(`Open Standard Movie Page: ${category}`);
     }
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 1.1 }}
-      className="relative w-screen h-screen bg-black overflow-hidden"
-    >
-      {/* 2x2 Grid */}
+    <div className="relative w-screen h-screen bg-black overflow-hidden">
       <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
-        <ArtworkQuadrant 
-          label="Best Picture" 
-          dataKey="bestPicture"
-          movieData={yearData.bestPicture} 
-          isSpecial={isSpecial(yearData.bestPicture)}
-          onClick={() => handleClick("Best Picture", yearData.bestPicture)} 
-        />
-        <ArtworkQuadrant 
-          label="Audience (Eng)" 
-          dataKey="highestRatedEnglish"
-          movieData={yearData.highestRatedEnglish} 
-          isSpecial={isSpecial(yearData.highestRatedEnglish)}
-          onClick={() => handleClick("Audience English", yearData.highestRatedEnglish)} 
-        />
-        <ArtworkQuadrant 
-          label="Best International" 
-          dataKey="bestInternational"
-          movieData={yearData.bestInternational} 
-          isSpecial={isSpecial(yearData.bestInternational)}
-          onClick={() => handleClick("Best International", yearData.bestInternational)} 
-        />
-        <ArtworkQuadrant 
-          label="Audience (Intl)" 
-          dataKey="highestRatedInternational"
-          movieData={yearData.highestRatedInternational} 
-          isSpecial={isSpecial(yearData.highestRatedInternational)}
-          onClick={() => handleClick("Audience Intl", yearData.highestRatedInternational)} 
-        />
+        <ArtworkQuadrant label="Best Picture" dataKey="bestPicture" movieData={yearData.bestPicture} isSpecial={isSpecial(yearData.bestPicture)} onClick={() => handleClick("Best Picture", yearData.bestPicture)} />
+        <ArtworkQuadrant label="Audience (Eng)" dataKey="highestRatedEnglish" movieData={yearData.highestRatedEnglish} isSpecial={isSpecial(yearData.highestRatedEnglish)} onClick={() => handleClick("Audience English", yearData.highestRatedEnglish)} />
+        <ArtworkQuadrant label="Best International" dataKey="bestInternational" movieData={yearData.bestInternational} isSpecial={isSpecial(yearData.bestInternational)} onClick={() => handleClick("Best International", yearData.bestInternational)} />
+        <ArtworkQuadrant label="Audience (Intl)" dataKey="highestRatedInternational" movieData={yearData.highestRatedInternational} isSpecial={isSpecial(yearData.highestRatedInternational)} onClick={() => handleClick("Audience Intl", yearData.highestRatedInternational)} />
       </div>
 
-      {/* CENTER YEAR BUTTON */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <button
+        <motion.button
           onClick={onBack}
-          className="pointer-events-auto group relative flex items-center justify-center px-6 py-3 bg-black/70 backdrop-blur-md border border-white/10 rounded-lg hover:bg-black hover:border-white/50 hover:scale-105 transition-all duration-300 z-50 shadow-2xl"
+          layoutId={`year-text-${year}`}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="pointer-events-auto cursor-pointer z-50 group hover:scale-105 transition-transform duration-300"
         >
-          <span className="text-white font-black text-3xl md:text-5xl tracking-tighter group-hover:hidden">
+          <span className="text-white font-black text-6xl md:text-9xl tracking-tighter drop-shadow-2xl">
             {year}
           </span>
-          <span className="hidden group-hover:block text-white font-bold text-sm uppercase tracking-widest">
-            Back to Timeline
-          </span>
-        </button>
+        </motion.button>
       </div>
-    </motion.div>
+    </div>
   );
 };
+
 // ==========================================
 // COMPONENT: TIMELINE VIEW
 // ==========================================
-const Timeline = ({ startDecade, onBack, onSelectYear }) => {
+const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
   const scrollRef = useRef(null);
-  const ITEM_WIDTH = 300; 
+  const [activeYear, setActiveYear] = useState(null);
+
+  // Center alignment logic
+  const paddingStyle = { paddingInline: `calc(50vw - ${ITEM_WIDTH / 2}px)` };
 
   useEffect(() => {
-    // If we have a target decade/year to jump to
-    if (scrollRef.current && startDecade) {
-      const yearElement = document.getElementById(`year-${startDecade}`);
-      if (yearElement) {
+    const targetId = focusYear ? `year-${focusYear}` : (startDecade ? `year-${startDecade}` : null);
+    if (scrollRef.current && targetId) {
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
         const container = scrollRef.current;
-        const scrollLeft = yearElement.offsetLeft - (container.clientWidth / 2) + (yearElement.clientWidth / 2);
+        const scrollLeft = targetElement.offsetLeft - (container.clientWidth / 2) + (ITEM_WIDTH / 2);
         
-        // CHANGED: 'smooth' -> 'auto'
-        // This makes it jump instantly so you don't see the long scroll animation
-        container.scrollTo({ 
-          left: scrollLeft, 
-          behavior: 'auto' 
-        });
+        container.scrollTo({ left: scrollLeft, behavior: 'auto' });
+        
+        const yearNum = parseInt(targetId.split('-')[1]);
+        setActiveYear(yearNum);
       }
     }
-  }, [startDecade]);
+  }, [startDecade, focusYear]);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const scrollLeft = scrollRef.current.scrollLeft;
+      const centerIndex = Math.round(scrollLeft / ITEM_WIDTH);
+      const currentYear = START_YEAR + centerIndex;
+      
+      if (currentYear !== activeYear && currentYear <= END_YEAR && currentYear >= START_YEAR) {
+        setActiveYear(currentYear);
+      }
+    }
+  };
 
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="w-full h-full bg-neutral-950 flex flex-col"
     >
       <div className="fixed top-0 left-0 w-full p-8 z-50 flex justify-between items-center pointer-events-none">
         <button 
           onClick={onBack}
-          className="pointer-events-auto px-6 py-2 bg-white text-black font-bold uppercase tracking-widest rounded-full hover:bg-neutral-300 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+          className="pointer-events-auto text-white/40 hover:text-white font-mono text-sm uppercase tracking-[0.2em] transition-colors"
         >
           ← Decades
         </button>
@@ -200,42 +176,60 @@ const Timeline = ({ startDecade, onBack, onSelectYear }) => {
 
       <div 
         ref={scrollRef}
+        onScroll={handleScroll}
         className="flex-1 overflow-x-auto no-scrollbar flex items-center relative snap-x snap-mandatory cursor-grab active:cursor-grabbing"
       >
         <div 
           className="absolute top-1/2 h-0.5 bg-white/20" 
           style={{ 
-            left: `calc(50vw + ${ITEM_WIDTH / 2}px)`, 
+            left: '50vw', 
             width: `${(YEARS.length - 1) * ITEM_WIDTH}px` 
           }} 
         />
 
-        <div className="flex px-[50vw]"> 
+        <div className="flex h-full items-center" style={paddingStyle}> 
           {YEARS.map((year) => {
             const isDecade = year % 10 === 0;
+            const isActive = year === activeYear;
+
             return (
               <div 
                 key={year}
                 id={`year-${year}`}
-                onClick={() => onSelectYear(year)}
-                className={`relative flex flex-col items-center justify-center shrink-0 h-screen snap-center group cursor-pointer`}
+                onClick={() => isActive && onSelectYear(year)}
+                className={`relative flex flex-col items-center justify-center shrink-0 h-full snap-center transition-all duration-300
+                  ${isActive ? 'cursor-pointer opacity-100 scale-110' : 'cursor-default opacity-20 scale-90'}
+                `}
                 style={{ width: `${ITEM_WIDTH}px` }}
               >
+                {/* Vertical Line */}
                 <div 
-                  className={`w-0.5 transition-all duration-300 bg-white 
-                    ${isDecade ? 'h-24 bg-white' : 'h-12 bg-white/50'}
-                    group-hover:h-32 group-hover:bg-red-500
+                  className={`w-0.5 transition-all duration-300 bg-white
+                    ${isDecade ? 'h-24' : 'h-12'}
+                    ${isActive ? 'h-40' : ''} 
                   `} 
                 />
-                <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-2 border-white rounded-full group-hover:scale-150 group-hover:bg-red-500 group-hover:border-red-500 transition-all duration-300 z-10" />
-                <h3 
-                  className={`mt-8 font-mono transition-all duration-300 select-none text-5xl font-bold
-                    ${isDecade ? 'text-white' : 'text-white/40'}
-                    group-hover:text-red-500 group-hover:scale-110
-                  `}
-                >
-                  {year}
-                </h3>
+                
+                {/* Dot */}
+                <div 
+                  className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-white rounded-full transition-all duration-300 z-10
+                    ${isActive ? 'bg-white scale-150' : 'bg-black'}
+                  `} 
+                />
+                
+                {/* Year Text */}
+                {isActive ? (
+                  <motion.h3 
+                    layoutId={`year-text-${year}`}
+                    className="mt-8 font-mono text-6xl font-black text-white select-none"
+                  >
+                    {year}
+                  </motion.h3>
+                ) : (
+                  <h3 className="mt-8 font-mono text-5xl font-normal text-white select-none">
+                    {year}
+                  </h3>
+                )}
               </div>
             );
           })}
@@ -244,6 +238,7 @@ const Timeline = ({ startDecade, onBack, onSelectYear }) => {
     </motion.div>
   );
 };
+
 // ==========================================
 // COMPONENT: DECADE SELECTOR
 // ==========================================
@@ -251,7 +246,10 @@ const DecadeSelector = ({ onSelect }) => {
   const decades = [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020];
 
   return (
-    <div className="w-screen h-screen bg-black flex flex-row overflow-hidden">
+    <motion.div 
+      exit={{ opacity: 0 }}
+      className="w-screen h-screen bg-black flex flex-row overflow-hidden"
+    >
       {decades.map((decade, index) => (
         <motion.div
           key={decade}
@@ -270,7 +268,7 @@ const DecadeSelector = ({ onSelect }) => {
           <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 pointer-events-none transition-colors" />
         </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 };
 
@@ -304,24 +302,29 @@ function App() {
 
   return (
     <div className="w-screen h-screen overflow-hidden bg-black text-white">
-      {view === 'home' && (
-        <DecadeSelector onSelect={handleDecadeSelect} />
-      )}
-      
-      {view === 'timeline' && (
-        <Timeline 
-          startDecade={selectedDecade} 
-          onBack={handleBackToHome} 
-          onSelectYear={handleYearSelect}
-        />
-      )}
+      <AnimatePresence mode="wait">
+        {view === 'home' && (
+          <DecadeSelector key="home" onSelect={handleDecadeSelect} />
+        )}
+        
+        {view === 'timeline' && (
+          <Timeline 
+            key="timeline"
+            startDecade={selectedDecade} 
+            focusYear={selectedYear} 
+            onBack={handleBackToHome} 
+            onSelectYear={handleYearSelect}
+          />
+        )}
 
-      {view === 'year' && selectedYear && (
-        <SingleYearView 
-          year={selectedYear} 
-          onBack={handleBackToTimeline} 
-        />
-      )}
+        {view === 'year' && selectedYear && (
+          <SingleYearView 
+            key="year"
+            year={selectedYear} 
+            onBack={handleBackToTimeline} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
