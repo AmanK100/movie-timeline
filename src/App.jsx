@@ -24,15 +24,14 @@ const DecadeSelector = ({ onSelect }) => {
           onClick={() => onSelect(decade)}
           className="relative flex-1 group cursor-pointer border-b md:border-b-0 md:border-r border-white/10 hover:bg-neutral-900 transition-colors duration-500 flex items-center justify-center overflow-hidden"
         >
-          {/* Background Number Faded */}
           <span className="absolute text-9xl font-black text-white/5 group-hover:text-white/10 transition-colors scale-150 select-none">
             {decade.toString().slice(2)}
           </span>
 
-          {/* Foreground Text */}
           <div className="z-10 text-center">
+            {/* Logic: Show full "2000s" or short "50s" */}
             <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tighter group-hover:scale-110 transition-transform duration-300">
-              {decade}s
+              {decade >= 2000 ? `${decade}s` : `${decade.toString().slice(2)}s`}
             </h2>
             <div className="w-0 group-hover:w-full h-0.5 bg-red-600 mt-4 transition-all duration-300 mx-auto" />
           </div>
@@ -43,18 +42,18 @@ const DecadeSelector = ({ onSelect }) => {
 };
 
 // ==========================================
-// COMPONENT: TIMELINE VIEW
+// COMPONENT: TIMELINE VIEW (Updated)
 // ==========================================
 const Timeline = ({ startDecade, onBack }) => {
   const scrollRef = useRef(null);
 
-  // Auto-scroll to the selected decade on mount
+  // Auto-scroll to selected decade
   useEffect(() => {
     if (scrollRef.current && startDecade) {
       const yearElement = document.getElementById(`year-${startDecade}`);
       if (yearElement) {
-        // Calculate center position
         const container = scrollRef.current;
+        // Center the target year in the viewport
         const scrollLeft = yearElement.offsetLeft - (container.clientWidth / 2) + (yearElement.clientWidth / 2);
         
         container.scrollTo({
@@ -71,7 +70,7 @@ const Timeline = ({ startDecade, onBack }) => {
       animate={{ opacity: 1 }}
       className="w-full h-full bg-neutral-950 flex flex-col"
     >
-      {/* Header / Nav */}
+      {/* Header */}
       <div className="fixed top-0 left-0 w-full p-8 z-50 flex justify-between items-center pointer-events-none">
         <button 
           onClick={onBack}
@@ -84,40 +83,47 @@ const Timeline = ({ startDecade, onBack }) => {
         </h1>
       </div>
 
-      {/* Scrollable Area */}
+      {/* SCROLL CONTAINER UPDATES:
+         1. Added `snap-x snap-mandatory` for locking.
+         2. Kept `cursor-grab` for mouse drag feel.
+      */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-x-auto no-scrollbar flex items-center relative cursor-grab active:cursor-grabbing"
-        // Optional: Enable drag-to-scroll logic here if desired, otherwise native scroll works
+        className="flex-1 overflow-x-auto no-scrollbar flex items-center relative snap-x snap-mandatory cursor-grab active:cursor-grabbing"
       >
-        {/* The Central Line */}
-        <div className="absolute top-1/2 left-0 w-[max-content] h-0.5 bg-white/20 min-w-full" style={{ width: `${YEARS.length * 300}px` }} />
+        {/* Central Line */}
+        <div className="absolute top-1/2 left-0 h-0.5 bg-white/20" style={{ width: `${YEARS.length * 300}px` }} />
 
-        {/* Years */}
-        <div className="flex px-[50vw]"> {/* Padding ensures first/last years can be centered */}
+        {/* Years Container */}
+        <div className="flex px-[50vw]"> 
           {YEARS.map((year) => {
             const isDecade = year % 10 === 0;
             return (
               <div 
                 key={year}
                 id={`year-${year}`}
-                className="relative flex flex-col items-center justify-center shrink-0 w-[300px] group"
+                // Added `snap-center` here to force this div to lock to center
+                className="relative flex flex-col items-center justify-center shrink-0 w-[300px] h-screen snap-center group"
               >
-                {/* Tick Mark */}
+                {/* Tick Mark: Decades are taller, but thickness is same */}
                 <div 
                   className={`w-0.5 transition-all duration-300 bg-white 
-                    ${isDecade ? 'h-16 group-hover:h-24 bg-white' : 'h-8 group-hover:h-16 bg-white/50'}
+                    ${isDecade ? 'h-24 bg-white' : 'h-12 bg-white/50'}
+                    group-hover:h-32 group-hover:bg-red-500
                   `} 
                 />
 
                 {/* Dot on the line */}
-                <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-2 border-white rounded-full group-hover:scale-150 group-hover:bg-white transition-all duration-300 z-10" />
+                <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-2 border-white rounded-full group-hover:scale-150 group-hover:bg-red-500 group-hover:border-red-500 transition-all duration-300 z-10" />
 
-                {/* Year Number */}
+                {/* Year Number: 
+                    UPDATED: Removed conditional sizing. All years are now text-5xl.
+                    Added opacity difference for non-decades to keep hierarchy clean without size jumping.
+                */}
                 <h3 
-                  className={`mt-8 font-mono transition-all duration-300 select-none
-                    ${isDecade ? 'text-4xl text-white font-bold' : 'text-xl text-white/50 font-normal'}
-                    group-hover:text-white group-hover:text-5xl group-hover:font-black
+                  className={`mt-8 font-mono transition-all duration-300 select-none text-5xl font-bold
+                    ${isDecade ? 'text-white' : 'text-white/40'}
+                    group-hover:text-red-500 group-hover:scale-110
                   `}
                 >
                   {year}
@@ -135,7 +141,7 @@ const Timeline = ({ startDecade, onBack }) => {
 // MAIN APP
 // ==========================================
 function App() {
-  const [view, setView] = useState('home'); // 'home' | 'timeline'
+  const [view, setView] = useState('home'); 
   const [selectedDecade, setSelectedDecade] = useState(null);
 
   const handleDecadeSelect = (decade) => {
