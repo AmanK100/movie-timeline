@@ -1,307 +1,158 @@
-import React, { useMemo, useRef, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { getProcessedData } from './oscarData';
+import React, { useRef, useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 // ==========================================
-// COMPONENT: PARALLAX IMAGE (Handles Real Images or Fallback)
+// CONFIGURATION
 // ==========================================
-const ParallaxImage = ({ containerRef, imgSrc, label = "IMG", scaleBase = 1.25 }) => {
-  const targetRef = useRef(null);
-  const [imgError, setImgError] = useState(false);
+const START_YEAR = 1950;
+const END_YEAR = 2024;
+const YEARS = Array.from({ length: END_YEAR - START_YEAR + 1 }, (_, i) => START_YEAR + i);
+const DECADES = [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020];
 
-  const { scrollXProgress } = useScroll({
-    target: targetRef,
-    container: containerRef,
-    axis: "x",
-    offset: ["start end", "end start"]
-  });
-
-  const x = useTransform(scrollXProgress, [0, 1], ["-15%", "15%"]);
-  const opacity = useTransform(scrollXProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
-
+// ==========================================
+// COMPONENT: DECADE SELECTOR (HOME)
+// ==========================================
+const DecadeSelector = ({ onSelect }) => {
   return (
-    <div ref={targetRef} className="w-full h-full overflow-hidden relative bg-black">
-      <motion.div 
-        style={{ x, opacity, scale: scaleBase }} 
-        className="w-full h-full bg-neutral-800 flex items-center justify-center relative origin-center"
-      >
-        {/* Background Gradients (Always visible for depth) */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-700 to-neutral-900" />
+    <div className="w-full h-full flex flex-col md:flex-row bg-neutral-950">
+      {DECADES.map((decade, index) => (
+        <motion.div
+          key={decade}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.05 }}
+          onClick={() => onSelect(decade)}
+          className="relative flex-1 group cursor-pointer border-b md:border-b-0 md:border-r border-white/10 hover:bg-neutral-900 transition-colors duration-500 flex items-center justify-center overflow-hidden"
+        >
+          {/* Background Number Faded */}
+          <span className="absolute text-9xl font-black text-white/5 group-hover:text-white/10 transition-colors scale-150 select-none">
+            {decade.toString().slice(2)}
+          </span>
+
+          {/* Foreground Text */}
+          <div className="z-10 text-center">
+            <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tighter group-hover:scale-110 transition-transform duration-300">
+              {decade}s
+            </h2>
+            <div className="w-0 group-hover:w-full h-0.5 bg-red-600 mt-4 transition-all duration-300 mx-auto" />
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+// ==========================================
+// COMPONENT: TIMELINE VIEW
+// ==========================================
+const Timeline = ({ startDecade, onBack }) => {
+  const scrollRef = useRef(null);
+
+  // Auto-scroll to the selected decade on mount
+  useEffect(() => {
+    if (scrollRef.current && startDecade) {
+      const yearElement = document.getElementById(`year-${startDecade}`);
+      if (yearElement) {
+        // Calculate center position
+        const container = scrollRef.current;
+        const scrollLeft = yearElement.offsetLeft - (container.clientWidth / 2) + (yearElement.clientWidth / 2);
         
-        {!imgError && imgSrc ? (
-          // 1. TRY TO SHOW REAL IMAGE
-          <img 
-            src={imgSrc} 
-            alt={label} 
-            className="absolute inset-0 w-full h-full object-cover"
-            onError={() => setImgError(true)} // If 404, switch to stub
-          />
-        ) : (
-          // 2. FALLBACK STUB (If image missing or error)
-          <>
-            <div className="absolute inset-0 opacity-20" 
-                style={{ backgroundImage: 'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
-            />
-            <span className="text-neutral-300 font-mono text-4xl font-black tracking-widest z-10 border-4 border-neutral-300 p-6 bg-black/40 backdrop-blur-md shadow-2xl uppercase">
-              {label}
-            </span>
-          </>
-        )}
-      </motion.div>
-    </div>
-  );
-};
-// ==========================================
-// COMPONENT: STATIC POSTER (Updated to Full Height Strip)
-// ==========================================
-const StaticPoster = ({ imgSrc }) => {
-  const [imgError, setImgError] = useState(false);
+        container.scrollTo({
+          left: scrollLeft,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [startDecade]);
 
   return (
-    // Changed: h-full, w-full, removed rounded corners for full-bleed look
-    <div className="h-full w-full bg-neutral-800 flex items-center justify-center shrink-0 overflow-hidden relative">
-      {!imgError && imgSrc ? (
-        <img 
-          src={imgSrc} 
-          alt="Poster"
-          className="w-full h-full object-cover" // object-cover ensures it crops nicely to fill the strip
-          onError={() => setImgError(true)}
-        />
-      ) : (
-        // Fallback Stub
-        <span className="text-neutral-500 font-mono text-xl font-bold border-4 border-neutral-600 p-4">
-          PORTRAIT POSTER
-        </span>
-      )}
-    </div>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="w-full h-full bg-neutral-950 flex flex-col"
+    >
+      {/* Header / Nav */}
+      <div className="fixed top-0 left-0 w-full p-8 z-50 flex justify-between items-center pointer-events-none">
+        <button 
+          onClick={onBack}
+          className="pointer-events-auto px-6 py-2 bg-white text-black font-bold uppercase tracking-widest rounded-full hover:bg-neutral-300 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+        >
+          ← Decades
+        </button>
+        <h1 className="text-white/30 font-mono text-sm tracking-[0.2em] uppercase">
+          Timeline {START_YEAR} — {END_YEAR}
+        </h1>
+      </div>
+
+      {/* Scrollable Area */}
+      <div 
+        ref={scrollRef}
+        className="flex-1 overflow-x-auto no-scrollbar flex items-center relative cursor-grab active:cursor-grabbing"
+        // Optional: Enable drag-to-scroll logic here if desired, otherwise native scroll works
+      >
+        {/* The Central Line */}
+        <div className="absolute top-1/2 left-0 w-[max-content] h-0.5 bg-white/20 min-w-full" style={{ width: `${YEARS.length * 300}px` }} />
+
+        {/* Years */}
+        <div className="flex px-[50vw]"> {/* Padding ensures first/last years can be centered */}
+          {YEARS.map((year) => {
+            const isDecade = year % 10 === 0;
+            return (
+              <div 
+                key={year}
+                id={`year-${year}`}
+                className="relative flex flex-col items-center justify-center shrink-0 w-[300px] group"
+              >
+                {/* Tick Mark */}
+                <div 
+                  className={`w-0.5 transition-all duration-300 bg-white 
+                    ${isDecade ? 'h-16 group-hover:h-24 bg-white' : 'h-8 group-hover:h-16 bg-white/50'}
+                  `} 
+                />
+
+                {/* Dot on the line */}
+                <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-black border-2 border-white rounded-full group-hover:scale-150 group-hover:bg-white transition-all duration-300 z-10" />
+
+                {/* Year Number */}
+                <h3 
+                  className={`mt-8 font-mono transition-all duration-300 select-none
+                    ${isDecade ? 'text-4xl text-white font-bold' : 'text-xl text-white/50 font-normal'}
+                    group-hover:text-white group-hover:text-5xl group-hover:font-black
+                  `}
+                >
+                  {year}
+                </h3>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </motion.div>
   );
-};
-
-// ==========================================
-// STUBS (Video & Text)
-// ==========================================
-
-const FullSizeVideoStub = () => (
-  <div className="w-full h-full max-w-5xl max-h-[80vh] aspect-video bg-neutral-900 rounded-lg border border-neutral-700 flex items-center justify-center shadow-2xl">
-    <div className="w-24 h-24 rounded-full border-4 border-neutral-500 flex items-center justify-center group cursor-pointer hover:border-white hover:scale-110 transition-all duration-300">
-      <div className="w-0 h-0 border-t-[20px] border-t-transparent border-l-[32px] border-l-neutral-500 border-b-[20px] border-b-transparent ml-2 group-hover:border-l-white transition-colors"></div>
-    </div>
-  </div>
-);
-
-const TextStub = ({ title, description }) => (
-  <div className="w-full max-w-lg space-y-6 p-8">
-    <h3 className="text-3xl font-bold text-white mb-4">{title}</h3>
-    {description ? (
-      <p className="text-neutral-400 text-lg leading-relaxed font-light">
-        {description}
-      </p>
-    ) : (
-      // Fallback text lines if no description in data
-      <>
-        <div className="h-4 bg-neutral-800 rounded w-full"></div>
-        <div className="h-4 bg-neutral-800 rounded w-full"></div>
-        <div className="h-4 bg-neutral-800 rounded w-5/6"></div>
-        <div className="h-4 bg-neutral-800 rounded w-full"></div>
-      </>
-    )}
-  </div>
-);
-
-// ==========================================
-// COVERS
-// ==========================================
-
-const YearCover = ({ year }) => (
-  <section className="min-w-[100vw] h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0">
-    <h2 className="text-[12rem] md:text-[20rem] font-bold stroke-text tracking-tighter">
-      {year}
-    </h2>
-  </section>
-);
-
-const CategoryCover = ({ title, subtitle }) => (
-  <section className="min-w-[100vw] h-full flex flex-col items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0 p-8">
-    <h2 className="text-4xl md:text-7xl font-black text-center uppercase tracking-tighter mb-6 stroke-text-white max-w-[90vw]">
-      {title}
-    </h2>
-    <p className="text-xl md:text-3xl text-red-600 font-mono tracking-widest uppercase border-t border-red-600 pt-4">
-      {subtitle}
-    </p>
-  </section>
-);
-
-const FullScreenTitle = ({ title, subtitle, bg = "bg-black" }) => (
-  <section className={`min-w-[100vw] h-full flex flex-col items-center justify-center snap-start ${bg} text-center p-4 border-r border-neutral-800 shrink-0`}>
-    <h1 className="text-6xl md:text-9xl font-black text-white tracking-tighter uppercase mb-4">
-      {title}
-    </h1>
-    {subtitle && (
-      <p className="text-xl md:text-2xl text-red-500 font-mono tracking-widest uppercase">
-        {subtitle}
-      </p>
-    )}
-  </section>
-);
-
-const IntroText = () => (
-  <section className="min-w-[60vw] h-full flex items-center justify-center snap-start bg-neutral-900 border-r border-neutral-800 p-12 shrink-0">
-    <div className="max-w-2xl text-xl text-neutral-300 leading-relaxed font-light">
-      <p className="mb-6"><strong className="text-white">Cinema is a battleground.</strong></p>
-      <p>The Academy vs The Audience. This archive explores the divergence.</p>
-    </div>
-  </section>
-);
-
-// ==========================================
-// MOVIE SLIDE (Receives full movie object)
-// ==========================================
-const MovieSlide = ({ scrollRef, movieData }) => {
-  // Safety check: if old data format or null, show error or skip
-  if (!movieData) return null;
-
-  // Even if movieData exists, the image paths inside it might lead to missing files.
-  // The StaticPoster and ParallaxImage components handle that internally now.
-
-  return (
-    <>
-      {/* SLIDE 1: INTRO (Portrait Poster + Info) */}
-      <section className="min-w-[100vw] h-full flex snap-start border-r border-neutral-800 bg-black shrink-0">
-        <div className="w-[40%] h-full flex items-center justify-center border-r border-neutral-900 bg-neutral-950">
-          <StaticPoster imgSrc={movieData.poster} />
-        </div>
-        <div className="w-[60%] h-full flex items-center justify-center bg-black">
-          <TextStub title={movieData.title} description={movieData.description} />
-        </div>
-      </section>
-
-      {/* SLIDE 2: IMMERSION (Wide Still Full Screen) */}
-      <section className="min-w-[100vw] h-full snap-start border-r border-neutral-800 bg-black shrink-0 overflow-hidden">
-        <ParallaxImage 
-          containerRef={scrollRef} 
-          imgSrc={movieData.still} 
-          label="WIDE STILL" 
-        />
-      </section>
-
-      {/* SLIDE 3: CONTEXT (Wide Still + Context Text) */}
-      <section className="min-w-[100vw] h-full flex snap-start border-r border-neutral-800 bg-black shrink-0">
-        <div className="w-[65%] h-full border-r border-neutral-900 overflow-hidden">
-          <ParallaxImage 
-            containerRef={scrollRef} 
-            imgSrc={movieData.still} 
-            label="WIDE STILL" 
-            scaleBase={1.2} 
-          />
-        </div>
-        <div className="w-[35%] h-full flex items-center justify-center bg-black">
-          <TextStub title="The Scene" description={movieData.description} />
-        </div>
-      </section>
-
-      {/* SLIDE 4: VIDEO */}
-      <section className="min-w-[100vw] h-full flex items-center justify-center snap-start border-r border-neutral-800 bg-black shrink-0 p-8">
-        <FullSizeVideoStub />
-      </section>
-    </>
-  );
-};
-
-// ==========================================
-// HELPERS
-// ==========================================
-const getOrdinalCeremony = (year) => {
-  const n = year - 1927;
-  const s = ["th", "st", "nd", "rd"];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 };
 
 // ==========================================
 // MAIN APP
 // ==========================================
 function App() {
-  const sortedData = useMemo(() => getProcessedData(1950), []);
-  const scrollContainerRef = useRef(null);
+  const [view, setView] = useState('home'); // 'home' | 'timeline'
+  const [selectedDecade, setSelectedDecade] = useState(null);
 
-  const dataByDecade = useMemo(() => {
-    const groups = {};
-    sortedData.forEach((item) => {
-      const decade = Math.floor(item.filmYear / 10) * 10;
-      if (!groups[decade]) groups[decade] = [];
-      groups[decade].push(item);
-    });
-    return groups;
-  }, [sortedData]);
-
-  const decades = Object.keys(dataByDecade).sort();
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    const handleWheel = (e) => {
-      if (container && e.deltaY !== 0) {
-        container.scrollLeft += e.deltaY;
-        e.preventDefault();
-      }
-    };
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    return () => window.removeEventListener('wheel', handleWheel);
-  }, []);
+  const handleDecadeSelect = (decade) => {
+    setSelectedDecade(decade);
+    setView('timeline');
+  };
 
   return (
-    <div 
-      ref={scrollContainerRef}
-      className="flex flex-row h-screen w-screen overflow-x-auto overflow-y-hidden bg-neutral-950 text-neutral-200 snap-x snap-mandatory items-stretch pb-4"
-    >
-      <FullScreenTitle title="Evolution" subtitle="The Academy vs The Audience" />
-      <IntroText />
-
-      {decades.map((decade) => (
-        <React.Fragment key={decade}>
-          <FullScreenTitle title={`${decade}s`} subtitle="The Era Begins" bg="bg-neutral-900" />
-          
-          {dataByDecade[decade].map((yearData) => {
-            const ceremonySubtitle = `${getOrdinalCeremony(yearData.filmYear)} Academy Awards`;
-
-            return (
-              <React.Fragment key={yearData.filmYear}>
-                
-                <YearCover year={yearData.filmYear} />
-
-                {/* BEST PICTURE */}
-                <CategoryCover title="Best Picture" subtitle={ceremonySubtitle} />
-                <MovieSlide 
-                  scrollRef={scrollContainerRef} 
-                  movieData={yearData.bestPicture} 
-                />
-
-                {/* AUDIENCE FAV (ENGLISH) */}
-                <CategoryCover title="Audience Favorite" subtitle="English Language" />
-                <MovieSlide 
-                  scrollRef={scrollContainerRef} 
-                  movieData={yearData.highestRatedEnglish} 
-                />
-
-                {/* INTERNATIONAL */}
-                <CategoryCover title="Best International Feature Film" subtitle={ceremonySubtitle} />
-                <MovieSlide 
-                  scrollRef={scrollContainerRef} 
-                  movieData={yearData.bestInternational} 
-                />
-
-                {/* AUDIENCE FAV (INTL) */}
-                <CategoryCover title="Audience Favorite" subtitle="International" />
-                <MovieSlide 
-                  scrollRef={scrollContainerRef} 
-                  movieData={yearData.highestRatedInternational} 
-                />
-              
-              </React.Fragment>
-            );
-          })}
-        </React.Fragment>
-      ))}
-      <section className="min-w-[20vw] h-full bg-black snap-start shrink-0"></section>
+    <div className="w-screen h-screen overflow-hidden bg-black text-white">
+      {view === 'home' ? (
+        <DecadeSelector onSelect={handleDecadeSelect} />
+      ) : (
+        <Timeline 
+          startDecade={selectedDecade} 
+          onBack={() => setView('home')} 
+        />
+      )}
     </div>
   );
 }
