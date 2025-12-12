@@ -10,35 +10,34 @@ const END_YEAR = 2024;
 const YEARS = Array.from({ length: END_YEAR - START_YEAR + 1 }, (_, i) => START_YEAR + i);
 const ITEM_WIDTH = 300; 
 
-// SHARED FONT CLASS (Ensures exact match between views)
+// SHARED FONT CLASS
 const YEAR_FONT_CLASS = "font-mono text-5xl md:text-6xl font-bold tracking-tighter select-none";
 
 // ==========================================
-// COMPONENT: ARTWORK QUADRANT
+// COMPONENT: ARTWORK QUADRANT (Updated: No Text Overlay)
 // ==========================================
-const ArtworkQuadrant = ({ label, movieData, dataKey, isSpecial, onClick }) => {
+const ArtworkQuadrant = ({ label, movieData, isHoveredExternally, onHoverChange, onClick }) => {
   const [imgError, setImgError] = useState(false);
   
-  let imgSrc = null;
-  if (movieData) {
-    const year = movieData.poster.split('/')[2]; 
-    if (isSpecial && !imgError) {
-      imgSrc = `/images/${year}/${dataKey}_special.jpg`;
-    } else {
-      imgSrc = movieData.artwork || movieData.poster;
-    }
-  }
+  const imgSrc = movieData ? (movieData.artwork || movieData.poster) : null;
+
+  // Visual State
+  const brightness = isHoveredExternally ? "brightness-100" : "brightness-50";
+  const scale = isHoveredExternally ? "scale-105" : "scale-100";
 
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }} // Standard fade
+      transition={{ duration: 0.5 }}
       onClick={onClick}
+      onMouseEnter={() => onHoverChange(movieData?.title)}
+      onMouseLeave={() => onHoverChange(null)}
       className="relative w-full h-full bg-neutral-900 overflow-hidden cursor-pointer group"
     >
-      <div className="absolute inset-0 transition-all duration-500 ease-in-out filter brightness-50 group-hover:brightness-100 group-hover:scale-105">
+      {/* Image Layer - Clean, no text on top */}
+      <div className={`absolute inset-0 transition-all duration-500 ease-in-out filter ${brightness} ${scale}`}>
         {!imgError && imgSrc ? (
           <img 
             src={imgSrc} 
@@ -52,12 +51,6 @@ const ArtworkQuadrant = ({ label, movieData, dataKey, isSpecial, onClick }) => {
           />
         )}
       </div>
-
-      <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 p-4 text-center">
-        <span className="font-mono text-sm md:text-xl font-bold uppercase tracking-widest border-2 border-white/50 bg-black/50 text-white backdrop-blur-md px-4 py-2">
-          {label}
-        </span>
-      </div>
     </motion.div>
   );
 };
@@ -66,43 +59,51 @@ const ArtworkQuadrant = ({ label, movieData, dataKey, isSpecial, onClick }) => {
 // COMPONENT: SINGLE YEAR GRID VIEW
 // ==========================================
 const SingleYearView = ({ year, onBack }) => {
+  const [hoveredTitle, setHoveredTitle] = useState(null);
+
   const yearData = useMemo(() => {
     const allData = getProcessedData(1950);
     return allData.find(item => item.filmYear === year);
   }, [year]);
 
-  const specials = useMemo(() => {
-    if (!yearData) return new Set();
-    const titles = [
-      yearData.bestPicture?.title,
-      yearData.highestRatedEnglish?.title,
-      yearData.bestInternational?.title,
-      yearData.highestRatedInternational?.title
-    ].filter(Boolean);
-    const duplicates = titles.filter((item, index) => titles.indexOf(item) !== index);
-    return new Set(duplicates);
-  }, [yearData]);
-
   if (!yearData) return <div className="text-white p-10">Data not found for {year}</div>;
 
-  const isSpecial = (movie) => movie && specials.has(movie.title);
-
-  const handleClick = (category, movie) => {
-    if (isSpecial(movie)) {
-      console.log(`Open SPOTLIGHT Page for: ${movie.title}`);
-    } else {
-      console.log(`Open Standard Movie Page: ${category}`);
-    }
+  const handleClick = (category) => {
+    console.log(`Open Movie Page: ${category}`);
   };
 
   return (
     <div className="relative w-screen h-screen bg-black overflow-hidden">
       {/* 2x2 Grid */}
       <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
-        <ArtworkQuadrant label="Best Picture" dataKey="bestPicture" movieData={yearData.bestPicture} isSpecial={isSpecial(yearData.bestPicture)} onClick={() => handleClick("Best Picture", yearData.bestPicture)} />
-        <ArtworkQuadrant label="Audience (Eng)" dataKey="highestRatedEnglish" movieData={yearData.highestRatedEnglish} isSpecial={isSpecial(yearData.highestRatedEnglish)} onClick={() => handleClick("Audience English", yearData.highestRatedEnglish)} />
-        <ArtworkQuadrant label="Best International" dataKey="bestInternational" movieData={yearData.bestInternational} isSpecial={isSpecial(yearData.bestInternational)} onClick={() => handleClick("Best International", yearData.bestInternational)} />
-        <ArtworkQuadrant label="Audience (Intl)" dataKey="highestRatedInternational" movieData={yearData.highestRatedInternational} isSpecial={isSpecial(yearData.highestRatedInternational)} onClick={() => handleClick("Audience Intl", yearData.highestRatedInternational)} />
+        <ArtworkQuadrant 
+          label="Best Picture" 
+          movieData={yearData.bestPicture} 
+          isHoveredExternally={hoveredTitle === yearData.bestPicture?.title}
+          onHoverChange={setHoveredTitle}
+          onClick={() => handleClick("Best Picture")} 
+        />
+        <ArtworkQuadrant 
+          label="Audience (Eng)" 
+          movieData={yearData.highestRatedEnglish} 
+          isHoveredExternally={hoveredTitle === yearData.highestRatedEnglish?.title}
+          onHoverChange={setHoveredTitle}
+          onClick={() => handleClick("Audience English")} 
+        />
+        <ArtworkQuadrant 
+          label="Best International" 
+          movieData={yearData.bestInternational} 
+          isHoveredExternally={hoveredTitle === yearData.bestInternational?.title}
+          onHoverChange={setHoveredTitle}
+          onClick={() => handleClick("Best International")} 
+        />
+        <ArtworkQuadrant 
+          label="Audience (Intl)" 
+          movieData={yearData.highestRatedInternational} 
+          isHoveredExternally={hoveredTitle === yearData.highestRatedInternational?.title}
+          onHoverChange={setHoveredTitle}
+          onClick={() => handleClick("Audience Intl")} 
+        />
       </div>
 
       {/* CENTER YEAR BUTTON */}
@@ -111,7 +112,6 @@ const SingleYearView = ({ year, onBack }) => {
           onClick={onBack}
           className="pointer-events-auto cursor-pointer z-50 group hover:scale-105 transition-transform duration-300"
         >
-          {/* STATIC TEXT (No layoutId) */}
           <span className={`${YEAR_FONT_CLASS} text-white drop-shadow-2xl`}>
             {year}
           </span>
@@ -130,7 +130,6 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
 
   const paddingStyle = { paddingInline: `calc(50vw - ${ITEM_WIDTH / 2}px)` };
 
-  // INITIAL SCROLL (Instant Teleport)
   useEffect(() => {
     const targetId = focusYear ? `year-${focusYear}` : (startDecade ? `year-${startDecade}` : null);
     if (scrollRef.current && targetId) {
@@ -138,6 +137,7 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
       if (targetElement) {
         const container = scrollRef.current;
         const scrollLeft = targetElement.offsetLeft - (container.clientWidth / 2) + (ITEM_WIDTH / 2);
+        
         container.scrollTo({ left: scrollLeft, behavior: 'auto' });
         
         const yearNum = parseInt(targetId.split('-')[1]);
@@ -146,7 +146,6 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
     }
   }, [startDecade, focusYear]);
 
-  // SCROLL LISTENER (Track Center)
   const handleScroll = () => {
     if (scrollRef.current) {
       const scrollLeft = scrollRef.current.scrollLeft;
@@ -163,29 +162,23 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
   const handleJumpDecade = (direction) => {
     if (!activeYear || !scrollRef.current) return;
 
-    // Calculate current decade floor (e.g., 1954 -> 1950)
     const currentDecadeStart = Math.floor(activeYear / 10) * 10;
-    
     let targetYear;
+
     if (direction === 'next') {
-        // If we are exactly on a decade (e.g., 1950), go to 1960. 
-        // If we are at 1954, go to 1960.
         targetYear = currentDecadeStart + 10;
     } else {
-        // If we are exactly on a decade (e.g., 1960), go to 1950.
-        // If we are at 1954, go to 1950.
         targetYear = (activeYear === currentDecadeStart) ? currentDecadeStart - 10 : currentDecadeStart;
     }
 
-    // Clamp to bounds
     if (targetYear < START_YEAR) targetYear = START_YEAR;
-    if (targetYear > END_YEAR) targetYear = 2020; // Cap at 2020s start for navigation purposes
+    if (targetYear > END_YEAR) targetYear = 2020; 
 
     const targetElement = document.getElementById(`year-${targetYear}`);
     if (targetElement) {
       const container = scrollRef.current;
       const scrollLeft = targetElement.offsetLeft - (container.clientWidth / 2) + (ITEM_WIDTH / 2);
-      container.scrollTo({ left: scrollLeft, behavior: 'smooth' }); // Smooth fast scroll
+      container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
     }
   };
 
@@ -196,7 +189,6 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
       exit={{ opacity: 0 }}
       className="w-full h-full bg-neutral-950 flex flex-col"
     >
-      {/* HEADER NAV */}
       <div className="fixed top-0 left-0 w-full p-8 z-50 flex justify-between items-center pointer-events-none">
         <button 
           onClick={onBack}
@@ -209,9 +201,8 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
         </h1>
       </div>
 
-      {/* FOOTER NAV (Previous / Next Decade) */}
+      {/* FOOTER NAV (JUMP BUTTONS) */}
       <div className="fixed bottom-0 left-0 w-full p-8 z-50 flex justify-between items-end pointer-events-none">
-        {/* PREV DECADE BUTTON */}
         <div className="pointer-events-auto">
           {activeYear > 1959 && (
             <button 
@@ -223,7 +214,6 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
           )}
         </div>
 
-        {/* NEXT DECADE BUTTON */}
         <div className="pointer-events-auto">
           {activeYear < 2020 && (
             <button 
@@ -236,7 +226,6 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
         </div>
       </div>
 
-      {/* SCROLL CONTAINER */}
       <div 
         ref={scrollRef}
         onScroll={handleScroll}
@@ -280,18 +269,9 @@ const Timeline = ({ startDecade, focusYear, onBack, onSelectYear }) => {
                 </div>
                 
                 <div className="pt-24"> 
-                  {isActive ? (
-                    <motion.h3 
-                      layoutId={`year-text-${year}`}
-                      className={`${YEAR_FONT_CLASS} text-white`}
-                    >
-                      {year}
-                    </motion.h3>
-                  ) : (
-                    <h3 className={`${YEAR_FONT_CLASS} text-white`}>
-                      {year}
-                    </h3>
-                  )}
+                  <h3 className={`${YEAR_FONT_CLASS} ${isActive ? 'text-white' : 'text-white'}`}>
+                    {year}
+                  </h3>
                 </div>
               </div>
             );
