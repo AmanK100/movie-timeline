@@ -266,7 +266,7 @@ export const oscarMasterList = [
     ceremonyNumber: 63, ceremonyYear: 1991, filmYear: 1990,
     bestPicture: mkMovie(1990, "bestPicture", "Dances with Wolves"),
     bestInternational: mkMovie(1990, "bestInternational", "Journey of Hope"),
-    highestRatedEnglish: mkMovie(1990, "highestRatedEnglish", "Goodfellas"),
+    highestRatedEnglish: mkMovie(1990, "highestRatedEnglish", "Goodfellas", ["https://youtu.be/8C2caqaJPPM?si=2NIDPgxR0QxdMye-", "https://youtu.be/XPiSB8fSviE?si=T8hvFEFYOJaijdVJ", "https://youtu.be/MbbUvhmw_Sc?si=5GVXVh0hKlSi_z59"]),
     highestRatedInternational: mkMovie(1990, "highestRatedInternational", "Close-Up")
   },
 
@@ -298,14 +298,14 @@ export const oscarMasterList = [
     ceremonyNumber: 59, ceremonyYear: 1987, filmYear: 1986,
     bestPicture: mkMovie(1986, "bestPicture", "Platoon"),
     bestInternational: mkMovie(1986, "bestInternational", "The Assault"),
-    highestRatedEnglish: mkMovie(1986, "highestRatedEnglish", "Stand by Me"),
+    highestRatedEnglish: mkMovie(1986, "highestRatedEnglish", "Stand by Me", ["https://youtu.be/8ancK3tdU-c?si=DnwqChnW43ElzIdt"]),
     highestRatedInternational: mkMovie(1986, "highestRatedInternational", "Come and See")
   },
   {
     ceremonyNumber: 58, ceremonyYear: 1986, filmYear: 1985,
     bestPicture: mkMovie(1985, "bestPicture", "Out of Africa"),
     bestInternational: mkMovie(1985, "bestInternational", "The Official Story"),
-    highestRatedEnglish: mkMovie(1985, "highestRatedEnglish", "Back to the Future"),
+    highestRatedEnglish: mkMovie(1985, "highestRatedEnglish", "Back to the Future", ["https://youtu.be/ez6WQ7IX72U?si=PAGzPRolcNCEStBT", "https://youtu.be/uduqQYfJ0_w?si=8fIIuqIB_rQoJFwi", "https://youtu.be/T_WSXXPQYeY?si=N3BValv_1kV4CGml"]),
     highestRatedInternational: mkMovie(1985, "highestRatedInternational", "Nausicaa of the Valley of the Wind")
   },
   {
@@ -319,7 +319,7 @@ export const oscarMasterList = [
     ceremonyNumber: 56, ceremonyYear: 1984, filmYear: 1983,
     bestPicture: mkMovie(1983, "bestPicture", "Terms of Endearment"),
     bestInternational: mkMovie(1983, "bestInternational", "Fanny and Alexander"),
-    highestRatedEnglish: mkMovie(1983, "highestRatedEnglish", "Scarface"),
+    highestRatedEnglish: mkMovie(1983, "highestRatedEnglish", "Scarface", ["https://youtu.be/WAlTJ8gPJ3M?si=4_1vhcofivHONhY5", "https://youtu.be/Olgn9sXNdl0?si=tbGwEcJ-sCJ-5O50"]),
     highestRatedInternational: mkMovie(1983, "highestRatedInternational", "Fanny and Alexander")
   },
   {
@@ -351,14 +351,14 @@ export const oscarMasterList = [
     ceremonyNumber: 52, ceremonyYear: 1980, filmYear: 1979,
     bestPicture: mkMovie(1979, "bestPicture", "Kramer vs. Kramer"),
     bestInternational: mkMovie(1979, "bestInternational", "The Tin Drum"),
-    highestRatedEnglish: mkMovie(1979, "highestRatedEnglish", "Apocalypse Now"),
+    highestRatedEnglish: mkMovie(1979, "highestRatedEnglish", "Apocalypse Now", ["https://youtu.be/9l-ViOOFH-s?si=WQE9ovAIw7gcSBi2", "https://youtu.be/VFuJsxEoYjU?si=fxPi_4KXpvjoWmFH"]),
     highestRatedInternational: mkMovie(1979, "highestRatedInternational", "Autumn Sonata")
   },
   {
     ceremonyNumber: 51, ceremonyYear: 1979, filmYear: 1978,
     bestPicture: mkMovie(1978, "bestPicture", "The Deer Hunter"),
     bestInternational: mkMovie(1978, "bestInternational", "Get Out Your Handkerchiefs"),
-    highestRatedEnglish: mkMovie(1978, "highestRatedEnglish", "The Deer Hunter"),
+    highestRatedEnglish: mkMovie(1978, "highestRatedEnglish", "The Deer Hunter", ["https://youtu.be/g7q1SjVdsNk?si=Hkjxdel4Uhrs7lfS", "https://youtu.be/iPaYTZp4bUc?si=6vND-FzTBsbXhq0f"]),
     highestRatedInternational: mkMovie(1978, "highestRatedInternational", "The Ascent")
   },
   {
@@ -379,7 +379,7 @@ export const oscarMasterList = [
     ceremonyNumber: 48, ceremonyYear: 1976, filmYear: 1975,
     bestPicture: mkMovie(1975, "bestPicture", "One Flew Over the Cuckoo's Nest"),
     bestInternational: mkMovie(1975, "bestInternational", "Dersu Uzala"),
-    highestRatedEnglish: mkMovie(1975, "highestRatedEnglish", "Barry Lyndon"),
+    highestRatedEnglish: mkMovie(1975, "highestRatedEnglish", "Barry Lyndon", ["https://youtu.be/JH8j_1dUlUU?si=8wQCQ0ywcwGGs6Xz", "https://youtu.be/RcLZU3_XNMo?si=U7T1Bs_u0NG5Gr1V"]),
     highestRatedInternational: mkMovie(1975, "highestRatedInternational", "Scenes from a Marriage")
   },
   {
@@ -423,7 +423,7 @@ export const oscarMasterList = [
   // ==============================================================================
   {
     ceremonyNumber: 42, ceremonyYear: 1970, filmYear: 1969,
-    bestPicture: mkMovie(1969, "bestPicture", "Midnight Cowboy"),
+    bestPicture: mkMovie(1969, "bestPicture", "Midnight Cowboy", ["https://youtu.be/o29GST0Lj28?si=ItRJhXeEgFQy3IZa", "https://youtu.be/c412hqucHKw?si=eyYR43cUGykZwBYB", "https://youtu.be/yaIalO-gRTI?si=iOeFp07tSOoqy3Nw"]),
     bestInternational: mkMovie(1969, "bestInternational", "Z"),
     highestRatedEnglish: mkMovie(1969, "highestRatedEnglish", "Kes"),
     highestRatedInternational: mkMovie(1969, "highestRatedInternational", "Army of Shadows")
@@ -460,7 +460,7 @@ export const oscarMasterList = [
     ceremonyNumber: 37, ceremonyYear: 1965, filmYear: 1964,
     bestPicture: mkMovie(1964, "bestPicture", "My Fair Lady"),
     bestInternational: mkMovie(1964, "bestInternational", "Yesterday, Today and Tomorrow"),
-    highestRatedEnglish: mkMovie(1964, "highestRatedEnglish", "Dr. Strangelove"),
+    highestRatedEnglish: mkMovie(1964, "highestRatedEnglish", "Dr. Strangelove", ["https://youtu.be/jPU1AYTxwg4?si=sEX8O7I70SDHx5Ec"]),
     highestRatedInternational: mkMovie(1964, "highestRatedInternational", "Woman in the Dunes")
   },
   {
@@ -472,9 +472,9 @@ export const oscarMasterList = [
   },
   {
     ceremonyNumber: 35, ceremonyYear: 1963, filmYear: 1962,
-    bestPicture: mkMovie(1962, "bestPicture", "Lawrence of Arabia"),
+    bestPicture: mkMovie(1962, "bestPicture", "Lawrence of Arabia", ["https://youtu.be/_AznzZAlwVA?si=QLNGjqtlaGjsUsfZ", "https://youtu.be/Mvdr-epa1hc?si=vHvPl2UCszVkwOQN"]),
     bestInternational: mkMovie(1962, "bestInternational", "Sundays and Cybele"),
-    highestRatedEnglish: mkMovie(1962, "highestRatedEnglish", "Lawrence of Arabia"),
+    highestRatedEnglish: mkMovie(1962, "highestRatedEnglish", "Lawrence of Arabia", ["https://youtu.be/_AznzZAlwVA?si=QLNGjqtlaGjsUsfZ", "https://youtu.be/Mvdr-epa1hc?si=vHvPl2UCszVkwOQN"]),
     highestRatedInternational: mkMovie(1962, "highestRatedInternational", "Harakiri")
   },
   {
