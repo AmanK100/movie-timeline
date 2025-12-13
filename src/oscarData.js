@@ -1,13 +1,11 @@
 // src/oscarData.js
 
 // Helper to generate consistent paths
-const mkMovie = (year, key, title) => ({
+const mkMovie = (year, key, title, videos = []) => ({
   title: title,
   artwork: `/images/${year}/${key}_artwork.jpg`,
   poster: `/images/${year}/${key}_poster.jpg`,
-  still: `/images/${year}/${key}_still.jpg`,
-  description: "", 
-  video: ""        
+  videos: videos      
 });
 
 export const oscarMasterList = [
