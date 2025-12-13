@@ -372,7 +372,7 @@ export const oscarMasterList = [
     ceremonyNumber: 49, ceremonyYear: 1977, filmYear: 1976,
     bestPicture: mkMovie(1976, "bestPicture", "Rocky"),
     bestInternational: mkMovie(1976, "bestInternational", "Black and White in Color"),
-    highestRatedEnglish: mkMovie(1976, "highestRatedEnglish", "Network"),
+    highestRatedEnglish: mkMovie(1976, "highestRatedEnglish", "Network", ["https://youtu.be/YlsI7ki8WTM?si=3ij7jN-YkkE_8Gc9"]),
     highestRatedInternational: mkMovie(1976, "highestRatedInternational", "Mirror")
   },
   {
@@ -468,7 +468,7 @@ export const oscarMasterList = [
     bestPicture: mkMovie(1963, "bestPicture", "Tom Jones"),
     bestInternational: mkMovie(1963, "bestInternational", "8½"),
     highestRatedEnglish: mkMovie(1963, "highestRatedEnglish", "The Great Escape"),
-    highestRatedInternational: mkMovie(1963, "highestRatedInternational", "High and Low")
+    highestRatedInternational: mkMovie(1963, "highestRatedInternational", "High and Low", ["https://youtu.be/wcALFnBJ54c?si=UAwAiR8KZqax358M"])
   },
   {
     ceremonyNumber: 35, ceremonyYear: 1963, filmYear: 1962,
@@ -527,43 +527,43 @@ export const oscarMasterList = [
     ceremonyNumber: 28, ceremonyYear: 1956, filmYear: 1955,
     bestPicture: mkMovie(1955, "bestPicture", "Marty"),
     bestInternational: mkMovie(1955, "bestInternational", "Samurai I: Musashi Miyamoto"),
-    highestRatedEnglish: mkMovie(1955, "highestRatedEnglish", "The Night of the Hunter"),
-    highestRatedInternational: mkMovie(1955, "highestRatedInternational", "Seven Samurai")
+    highestRatedEnglish: mkMovie(1955, "highestRatedEnglish", "The Night of the Hunter", ["https://youtu.be/Y8dX6ZKJe2o?si=PGcaG2ovAQhDT1nt", "https://youtu.be/IfpbVqdkLbo?si=xdMr_PU8pvusvL7W"]),
+    highestRatedInternational: mkMovie(1955, "highestRatedInternational", "Seven Samurai", ["https://youtu.be/1XMJY0hYJEw?si=crzGQnJ8tXROK6nq"])
   },
   {
     ceremonyNumber: 27, ceremonyYear: 1955, filmYear: 1954,
-    bestPicture: mkMovie(1954, "bestPicture", "On the Waterfront"),
+    bestPicture: mkMovie(1954, "bestPicture", "On the Waterfront", ["https://youtu.be/vOdYAXOfLMc?si=9ZSzJhUvX_N1QMO9", "https://youtu.be/1BaUJk3YlEI?si=e1mSEs0VfFNno9Kf"]),
     bestInternational: mkMovie(1954, "bestInternational", "Gate of Hell"),
-    highestRatedEnglish: mkMovie(1954, "highestRatedEnglish", "Rear Window"),
-    highestRatedInternational: mkMovie(1954, "highestRatedInternational", "The Wages of Fear")
+    highestRatedEnglish: mkMovie(1954, "highestRatedEnglish", "Rear Window", ["https://youtu.be/m01YktiEZCw?si=-q1n7NS0rGy72kDq"]),
+    highestRatedInternational: mkMovie(1954, "highestRatedInternational", "The Wages of Fear", ["https://youtu.be/ZYDZ3vNa-MQ?si=W_KZYR771NtiLztz", "https://youtu.be/cmToeytaVoc?si=qGtFscpEE1xSSJog"])
   },
   {
     ceremonyNumber: 26, ceremonyYear: 1954, filmYear: 1953,
-    bestPicture: mkMovie(1953, "bestPicture", "From Here to Eternity"),
+    bestPicture: mkMovie(1953, "bestPicture", "From Here to Eternity", ["https://youtu.be/Z7PmarMfuog?si=amiRmRepqyQmKcBm"]),
     bestInternational: mkMovie(1953, "bestInternational", "NONE"),
-    highestRatedEnglish: mkMovie(1953, "highestRatedEnglish", "Roman Holiday"),
-    highestRatedInternational: mkMovie(1953, "highestRatedInternational", "Tokyo Story")
+    highestRatedEnglish: mkMovie(1953, "highestRatedEnglish", "Roman Holiday", ["https://youtu.be/2vm2FdHg7Io?si=E45RAiDMIqg6oJfU"]),
+    highestRatedInternational: mkMovie(1953, "highestRatedInternational", "Tokyo Story", ["https://youtu.be/5zEKw4VQIeY?si=Au-eT0BacaV-GuUT", "https://youtu.be/R65wTHVUCGk?si=4SC2kG9zB7NKjNbA"])
   },
   {
     ceremonyNumber: 25, ceremonyYear: 1953, filmYear: 1952,
-    bestPicture: mkMovie(1952, "bestPicture", "The Greatest Show on Earth"),
-    bestInternational: mkMovie(1952, "bestInternational", "Forbidden Games"),
-    highestRatedEnglish: mkMovie(1952, "highestRatedEnglish", "Singin' in the Rain"),
-    highestRatedInternational: mkMovie(1952, "highestRatedInternational", "Ikiru")
+    bestPicture: mkMovie(1952, "bestPicture", "The Greatest Show on Earth", ["https://youtu.be/pNygNdVd7kM?si=5jfNoi4WJ5J377zO"]),
+    bestInternational: mkMovie(1952, "bestInternational", "Forbidden Games", ["https://youtu.be/JUwdB3PS8jg?si=EeTPZi3xVW6ECUKk"]),
+    highestRatedEnglish: mkMovie(1952, "highestRatedEnglish", "Singin' in the Rain", ["https://youtu.be/swloMVFALXw?si=rdcNZDydFV1xU9D-"]),
+    highestRatedInternational: mkMovie(1952, "highestRatedInternational", "Ikiru", ["https://youtu.be/2VeLN3IDjzQ?si=oTZwGYNWan979nLb"])
   },
   {
     ceremonyNumber: 24, ceremonyYear: 1952, filmYear: 1951,
-    bestPicture: mkMovie(1951, "bestPicture", "An American in Paris"),
-    bestInternational: mkMovie(1951, "bestInternational", "Rashomon"),
-    highestRatedEnglish: mkMovie(1951, "highestRatedEnglish", "Ace in the Hole"),
-    highestRatedInternational: mkMovie(1951, "highestRatedInternational", "Rashomon")
+    bestPicture: mkMovie(1951, "bestPicture", "An American in Paris", ["https://youtu.be/o2WAMZRCbpU?si=CIVweI_EY0QiaTtJ", "https://youtu.be/mM-K2xVFyk0?si=bQks2_I4Gcg5jsOk"]),
+    bestInternational: mkMovie(1951, "bestInternational", "Rashomon", ["https://youtu.be/L2E_DfExUmU?si=qRT3zcX4EtdGtxYa"]),
+    highestRatedEnglish: mkMovie(1951, "highestRatedEnglish", "Ace in the Hole", ["https://youtu.be/dY5_MJg7o5U?si=J9Kkmu3rUcdK4w9T"]),
+    highestRatedInternational: mkMovie(1951, "highestRatedInternational", "Rashomon", ["https://youtu.be/L2E_DfExUmU?si=qRT3zcX4EtdGtxYa"])
   },
   {
     ceremonyNumber: 23, ceremonyYear: 1951, filmYear: 1950,
-    bestPicture: mkMovie(1950, "bestPicture", "All About Eve"),
-    bestInternational: mkMovie(1950, "bestInternational", "The Walls of Malapaga"),
-    highestRatedEnglish: mkMovie(1950, "highestRatedEnglish", "Sunset Boulevard"),
-    highestRatedInternational: mkMovie(1950, "highestRatedInternational", "Late Spring")
+    bestPicture: mkMovie(1950, "bestPicture", "All About Eve", ["https://youtu.be/MILphnfj2mo?si=zVwouzCFIYvxyh54"]),
+    bestInternational: mkMovie(1950, "bestInternational", "The Walls of Malapaga", ["https://youtu.be/KAEyeLLyUyA?si=o64p-VSlVxJ4TDRh"]),
+    highestRatedEnglish: mkMovie(1950, "highestRatedEnglish", "Sunset Boulevard", ["https://youtu.be/klM1GSJsblQ?si=Jg2Y6iVEPENDVq6-"]),
+    highestRatedInternational: mkMovie(1950, "highestRatedInternational", "Late Spring", ["https://youtu.be/_4Ul10BSzRw?si=2tQGlMTrtxdfImZk"])
   },
 
   // ==============================================================================
