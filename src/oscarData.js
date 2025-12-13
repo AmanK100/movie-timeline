@@ -276,9 +276,9 @@ export const oscarMasterList = [
   {
     ceremonyNumber: 62, ceremonyYear: 1990, filmYear: 1989,
     bestPicture: mkMovie(1989, "bestPicture", "Driving Miss Daisy"),
-    bestInternational: mkMovie(1989, "bestInternational", "Cinema Paradiso"),
-    highestRatedEnglish: mkMovie(1989, "highestRatedEnglish", "Do the Right Thing"),
-    highestRatedInternational: mkMovie(1989, "highestRatedInternational", "Cinema Paradiso")
+    bestInternational: mkMovie(1989, "bestInternational", "Cinema Paradiso", ["https://youtu.be/JMyVSD6OvO8?si=RLfNgaWaB3h6hlxt", "https://youtu.be/LwhtXgmsPZA?si=JC7bq7hSP7lw1eYC"]),
+    highestRatedEnglish: mkMovie(1989, "highestRatedEnglish", "Do the Right Thing", ["https://youtu.be/yVAD4fYRcvA?si=WCEdiP1Tdf8qNVDV", "https://youtu.be/VIhL6IOAfvw?si=K9_i83UeNfb9RG-f", "https://youtu.be/kj2sxtVy8EQ?si=gvraCnwl5gm-gxdz"]),
+    highestRatedInternational: mkMovie(1989, "highestRatedInternational", "Cinema Paradiso", ["https://youtu.be/JMyVSD6OvO8?si=RLfNgaWaB3h6hlxt", "https://youtu.be/LwhtXgmsPZA?si=JC7bq7hSP7lw1eYC"])
   },
   {
     ceremonyNumber: 61, ceremonyYear: 1989, filmYear: 1988,
