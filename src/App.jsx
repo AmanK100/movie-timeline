@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getProcessedData } from './oscarData';
+import { fetchMovieData } from './tmdb'; // Ensure you created this file in the previous step!
 
 // ==========================================
 // CONFIGURATION
@@ -14,14 +15,11 @@ const ITEM_WIDTH = 300;
 const YEAR_FONT_CLASS = "font-mono text-5xl md:text-6xl font-bold tracking-tighter select-none";
 
 // ==========================================
-// COMPONENT: ARTWORK QUADRANT (Updated: No Text Overlay)
+// COMPONENT: ARTWORK QUADRANT
 // ==========================================
 const ArtworkQuadrant = ({ label, movieData, isHoveredExternally, onHoverChange, onClick }) => {
   const [imgError, setImgError] = useState(false);
-  
   const imgSrc = movieData ? (movieData.artwork || movieData.poster) : null;
-
-  // Visual State
   const brightness = isHoveredExternally ? "brightness-100" : "brightness-50";
   const scale = isHoveredExternally ? "scale-105" : "scale-100";
 
@@ -36,7 +34,6 @@ const ArtworkQuadrant = ({ label, movieData, isHoveredExternally, onHoverChange,
       onMouseLeave={() => onHoverChange(null)}
       className="relative w-full h-full bg-neutral-900 overflow-hidden cursor-pointer group"
     >
-      {/* Image Layer - Clean, no text on top */}
       <div className={`absolute inset-0 transition-all duration-500 ease-in-out filter ${brightness} ${scale}`}>
         {!imgError && imgSrc ? (
           <img 
@@ -56,9 +53,149 @@ const ArtworkQuadrant = ({ label, movieData, isHoveredExternally, onHoverChange,
 };
 
 // ==========================================
+// COMPONENT: MOVIE PAGE (Vertical Scroll)
+// ==========================================
+const MoviePage = ({ movie, year, onBack }) => {
+  const [apiData, setApiData] = useState(null);
+
+  // 1. Fetch Data on Load
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchMovieData(movie.title, year);
+      setApiData(data);
+    };
+    if (movie) loadData();
+  }, [movie, year]);
+
+  // 2. Calculate Awards (Handle Duplicates)
+  const awards = useMemo(() => {
+    const yearData = getProcessedData(1950).find(y => y.filmYear === year);
+    if (!yearData) return [];
+    
+    const list = [];
+    if (yearData.bestPicture?.title === movie.title) list.push("Best Picture");
+    if (yearData.highestRatedEnglish?.title === movie.title) list.push("Highest Rated (English)");
+    if (yearData.bestInternational?.title === movie.title) list.push("Best International Feature");
+    if (yearData.highestRatedInternational?.title === movie.title) list.push("Highest Rated (International)");
+    
+    return list;
+  }, [movie, year]);
+
+  if (!movie) return null;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="w-full h-screen bg-black overflow-y-auto no-scrollbar snap-y snap-mandatory"
+    >
+      {/* SECTION 1: HERO ARTWORK (Clean, No Text) */}
+      <div className="relative w-full h-screen snap-start shrink-0">
+        <div className="absolute inset-0">
+           <img 
+             src={movie.artwork || movie.poster} 
+             alt={movie.title} 
+             className="w-full h-full object-cover"
+           />
+           {/* Subtle gradient at bottom to blend into next section */}
+           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent" />
+        </div>
+      </div>
+
+      {/* SECTION 2: DETAILS (Poster Left / Info Right) */}
+      <div className="w-full min-h-screen snap-start shrink-0 bg-black flex flex-col md:flex-row items-center justify-center p-8 md:p-20 gap-10 md:gap-20">
+         
+         {/* LEFT: Poster */}
+         <div className="w-full md:w-1/3 h-[50vh] md:h-[80vh] flex justify-center items-center">
+            <img 
+              src={movie.poster} 
+              alt={`${movie.title} Poster`} 
+              className="h-full w-auto object-contain shadow-[0_0_50px_rgba(255,255,255,0.05)] rounded-sm"
+            />
+         </div>
+
+         {/* RIGHT: Text Hierarchy */}
+         <div className="w-full md:w-1/2 flex flex-col justify-center text-left space-y-6">
+            
+            {/* 1. TITLE (Biggest) */}
+            <h1 className="text-5xl md:text-8xl font-black text-white uppercase tracking-tighter leading-none">
+              {movie.title}
+            </h1>
+
+            {/* 2. DIRECTOR (Medium) */}
+            <h2 className="text-xl md:text-2xl font-bold text-white/80 uppercase tracking-widest">
+              Directed by {apiData?.director ? apiData.director : <span className="opacity-30">Loading...</span>}
+            </h2>
+
+            {/* 3. TAGLINE (Italic/Styled) */}
+            {apiData?.tagline && (
+              <p className="text-lg md:text-xl text-red-500 font-serif italic opacity-80">
+                "{apiData.tagline}"
+              </p>
+            )}
+
+            {/* 4. OVERVIEW (Main Description) */}
+            <p className="text-lg md:text-xl text-neutral-400 leading-relaxed font-serif max-w-2xl">
+              {apiData?.description || "Loading plot details from TMDB..."}
+            </p>
+
+            {/* 5. AWARDS LIST (Badges) */}
+            <div className="pt-6">
+                <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-white/30 mb-4">
+                  Awards & Recognition
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {awards.map((award, i) => (
+                    <span 
+                      key={i} 
+                      className="px-4 py-2 border border-white/20 bg-white/5 text-white text-sm font-mono uppercase tracking-wider rounded-full whitespace-nowrap"
+                    >
+                      {award}
+                    </span>
+                  ))}
+                </div>
+            </div>
+         </div>
+      </div>
+
+      {/* SECTION 3+: VIDEOS (Full Screen Scroll) */}
+      {movie.videos && movie.videos.length > 0 && movie.videos.map((videoUrl, index) => (
+        <div key={index} className="w-full h-screen snap-start shrink-0 bg-black flex items-center justify-center relative">
+           {/* Placeholder for Video Embed - replace with iframe later */}
+           <div className="w-full h-full md:w-[90%] md:h-[90%] bg-neutral-900 border border-neutral-800 flex items-center justify-center">
+              <p className="text-white/50 font-mono text-center">
+                VIDEO EMBED <br/>
+                <span className="text-xs text-blue-400">{videoUrl}</span>
+              </p>
+           </div>
+           
+           <div className="absolute top-10 left-10 bg-black/50 px-4 py-2 rounded text-white font-mono text-sm uppercase tracking-widest">
+              Clip {index + 1}
+           </div>
+        </div>
+      ))}
+
+      {/* SECTION LAST: RETURN FOOTER */}
+      <div className="w-full h-[50vh] snap-start shrink-0 bg-black flex items-center justify-center">
+         <button 
+           onClick={onBack}
+           className="px-10 py-4 border border-white/20 hover:bg-white hover:text-black hover:scale-105 transition-all duration-300 rounded-full"
+         >
+           <span className="font-mono text-sm uppercase tracking-[0.3em] font-bold">
+             Return to {year}
+           </span>
+         </button>
+      </div>
+
+    </motion.div>
+  );
+};
+
+// ==========================================
 // COMPONENT: SINGLE YEAR GRID VIEW
 // ==========================================
-const SingleYearView = ({ year, onBack }) => {
+const SingleYearView = ({ year, onBack, onSelectMovie }) => {
   const [hoveredTitle, setHoveredTitle] = useState(null);
 
   const yearData = useMemo(() => {
@@ -81,28 +218,28 @@ const SingleYearView = ({ year, onBack }) => {
           movieData={yearData.bestPicture} 
           isHoveredExternally={hoveredTitle === yearData.bestPicture?.title}
           onHoverChange={setHoveredTitle}
-          onClick={() => handleClick("Best Picture")} 
+          onClick={() => onSelectMovie(yearData.bestPicture)} 
         />
         <ArtworkQuadrant 
           label="Audience (Eng)" 
           movieData={yearData.highestRatedEnglish} 
           isHoveredExternally={hoveredTitle === yearData.highestRatedEnglish?.title}
           onHoverChange={setHoveredTitle}
-          onClick={() => handleClick("Audience English")} 
+          onClick={() => onSelectMovie(yearData.highestRatedEnglish)} 
         />
         <ArtworkQuadrant 
           label="Best International" 
           movieData={yearData.bestInternational} 
           isHoveredExternally={hoveredTitle === yearData.bestInternational?.title}
           onHoverChange={setHoveredTitle}
-          onClick={() => handleClick("Best International")} 
+          onClick={() => onSelectMovie(yearData.bestInternational)} 
         />
         <ArtworkQuadrant 
           label="Audience (Intl)" 
           movieData={yearData.highestRatedInternational} 
           isHoveredExternally={hoveredTitle === yearData.highestRatedInternational?.title}
           onHoverChange={setHoveredTitle}
-          onClick={() => handleClick("Audience Intl")} 
+          onClick={() => onSelectMovie(yearData.highestRatedInternational)} 
         />
       </div>
 
@@ -322,6 +459,7 @@ function App() {
   const [view, setView] = useState('home');
   const [selectedDecade, setSelectedDecade] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
   const handleDecadeSelect = (decade) => {
     setSelectedDecade(decade);
@@ -333,8 +471,18 @@ function App() {
     setView('year');
   };
 
+  const handleMovieSelect = (movie) => {
+    setSelectedMovie(movie);
+    setView('movie');
+  };
+
   const handleBackToTimeline = () => {
     setView('timeline');
+  };
+
+  const handleBackToYear = () => {
+    setView('year');
+    setSelectedMovie(null);
   };
 
   const handleBackToHome = () => {
@@ -365,6 +513,16 @@ function App() {
             key="year"
             year={selectedYear} 
             onBack={handleBackToTimeline} 
+            onSelectMovie={handleMovieSelect}
+          />
+        )}
+
+        {view === 'movie' && selectedMovie && (
+          <MoviePage 
+            key="movie"
+            movie={selectedMovie}
+            year={selectedYear}
+            onBack={handleBackToYear}
           />
         )}
       </AnimatePresence>
