@@ -255,7 +255,7 @@ export const oscarMasterList = [
     bestPicture: mkMovie(1992, "bestPicture", "Unforgiven"),
     bestInternational: mkMovie(1992, "bestInternational", "Indochine"),
     highestRatedEnglish: mkMovie(1992, "highestRatedEnglish", "Twin Peaks: Fire Walk with Me"),
-    highestRatedInternational: mkMovie(1992, "highestRatedInternational", "Life, and Nothing More...")
+    highestRatedInternational: mkMovie(1992, "highestRatedInternational", "And Life Goes On...")
   },
   {
     ceremonyNumber: 64, ceremonyYear: 1992, filmYear: 1991,
