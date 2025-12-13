@@ -51,7 +51,6 @@ const ArtworkQuadrant = ({ label, movieData, isHoveredExternally, onHoverChange,
     </motion.div>
   );
 };
-
 // ==========================================
 // COMPONENT: MOVIE PAGE (Vertical Scroll)
 // ==========================================
@@ -80,6 +79,24 @@ const MoviePage = ({ movie, year, onBack }) => {
     
     return list;
   }, [movie, year]);
+
+  // Helper to extract YouTube ID from various URL formats
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    let videoId = null;
+    
+    // Handle standard youtube.com/watch?v=ID
+    if (url.includes('youtube.com/watch')) {
+      const urlParams = new URLSearchParams(new URL(url).search);
+      videoId = urlParams.get('v');
+    } 
+    // Handle youtu.be/ID
+    else if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split('?')[0];
+    }
+
+    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1` : null;
+  };
 
   if (!movie) return null;
 
@@ -160,21 +177,29 @@ const MoviePage = ({ movie, year, onBack }) => {
       </div>
 
       {/* SECTION 3+: VIDEOS (Full Screen Scroll) */}
-      {movie.videos && movie.videos.length > 0 && movie.videos.map((videoUrl, index) => (
-        <div key={index} className="w-full h-screen snap-start shrink-0 bg-black flex items-center justify-center relative">
-           {/* Placeholder for Video Embed - replace with iframe later */}
-           <div className="w-full h-full md:w-[90%] md:h-[90%] bg-neutral-900 border border-neutral-800 flex items-center justify-center">
-              <p className="text-white/50 font-mono text-center">
-                VIDEO EMBED <br/>
-                <span className="text-xs text-blue-400">{videoUrl}</span>
-              </p>
-           </div>
-           
-           <div className="absolute top-10 left-10 bg-black/50 px-4 py-2 rounded text-white font-mono text-sm uppercase tracking-widest">
-              Clip {index + 1}
-           </div>
-        </div>
-      ))}
+      {movie.videos && movie.videos.length > 0 && movie.videos.map((videoUrl, index) => {
+        const embedUrl = getYouTubeEmbedUrl(videoUrl);
+        
+        return (
+          <div key={index} className="w-full h-screen snap-start shrink-0 bg-black flex items-center justify-center relative">
+            {embedUrl ? (
+              <iframe 
+                className="w-full h-full"
+                src={embedUrl}
+                title={`Movie Clip ${index + 1}`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              // Fallback if URL isn't a valid YouTube link
+              <div className="w-full h-full flex items-center justify-center bg-neutral-900">
+                <p className="text-white/50 font-mono">Invalid Video URL</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
 
       {/* SECTION LAST: RETURN FOOTER */}
       <div className="w-full h-[50vh] snap-start shrink-0 bg-black flex items-center justify-center">

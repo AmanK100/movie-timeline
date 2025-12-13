@@ -239,7 +239,7 @@ export const oscarMasterList = [
     bestPicture: mkMovie(1994, "bestPicture", "Forrest Gump"),
     bestInternational: mkMovie(1994, "bestInternational", "Burnt by the Sun"),
     highestRatedEnglish: mkMovie(1994, "highestRatedEnglish", "The Shawshank Redemption"),
-    highestRatedInternational: mkMovie(1994, "highestRatedInternational", "Chungking Express")
+    highestRatedInternational: mkMovie(1994, "highestRatedInternational", "Chungking Express", ["https://youtu.be/tCqnp_3-xts?si=rMZ3PJu6Qo-l9Ylq", "https://youtu.be/n6acks-wQ1w?si=Nq4wt-Jd_6jif7yl", "https://youtu.be/RoHg-RvcwzE?si=Cms-Xbtecyu-JHyP"])
   },
   {
     ceremonyNumber: 66, ceremonyYear: 1994, filmYear: 1993,
